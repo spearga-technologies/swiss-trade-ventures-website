@@ -1,0 +1,125 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import ProductsHero from '../components/ProductsHero.astro';
+import ProductCategory from '../components/ProductCategory.astro';
+import ProductsContactCTA from '../components/ProductsContactCTA.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+import Footer from '../components/Footer.astro';
+
+// Product data for each category
+const productCategories = [
+  {
+    title: "Patient Care & General Medical Consumables",
+    description: "Essential medical supplies for patient care and general healthcare needs",
+    categoryId: "patient-care",
+    viewAllLink: "/products/patient-care",
+    products: [
+      {
+        name: "Sterile Surgical Gloves",
+        image: "/Patient-Care-&-General-Medical-Consumables.png",
+        description: "Premium latex and nitrile gloves for surgical procedures"
+      },
+      {
+        name: "IV Cannula Systems",
+        image: "/Patient-Care-&-General-Medical-Consumables.png",
+        description: "Complete intravenous cannula and infusion systems"
+      },
+      {
+        name: "Wound Care Solutions",
+        image: "/Patient-Care-&-General-Medical-Consumables.png",
+        description: "Advanced wound care and bandaging solutions"
+      }
+    ]
+  },
+  {
+    title: "Diagnostic & Laboratory Supplies",
+    description: "Comprehensive diagnostic tools and laboratory equipment for accurate testing",
+    categoryId: "diagnostic-lab",
+    viewAllLink: "/products/diagnostic-lab",
+    products: [
+      {
+        name: "IVD Testing Kits",
+        image: "/Diagnostic-&-Laboratory-Supplies.png",
+        description: "In-vitro diagnostic kits for pregnancy, malaria, HIV testing"
+      },
+      {
+        name: "Laboratory Consumables",
+        image: "/Diagnostic-&-Laboratory-Supplies.png",
+        description: "Sample containers and laboratory testing supplies"
+      },
+      {
+        name: "Blood Collection Systems",
+        image: "/Diagnostic-&-Laboratory-Supplies.png",
+        description: "Complete blood collection and storage systems"
+      }
+    ]
+  },
+  {
+    title: "Surgical & Implantable Devices",
+    description: "Advanced surgical instruments and implantable medical devices",
+    categoryId: "surgical-devices",
+    viewAllLink: "/products/surgical-devices",
+    products: [
+      {
+        name: "Premium Sutures",
+        image: "/Surgical-mesh-&-implantable-stents.png",
+        description: "High-quality sutures in multiple materials and sizes"
+      },
+      {
+        name: "Surgical Mesh",
+        image: "/Surgical-mesh-&-implantable-stents.png",
+        description: "Biocompatible surgical mesh for various procedures"
+      },
+      {
+        name: "Implantable Stents",
+        image: "/Surgical-mesh-&-implantable-stents.png",
+        description: "Advanced stent systems for cardiovascular procedures"
+      }
+    ]
+  },
+  {
+    title: "Specialized & Advanced Medical Kits",
+    description: "Cutting-edge medical kits for specialized treatments and procedures",
+    categoryId: "specialized-kits",
+    viewAllLink: "/products/specialized-kits",
+    products: [
+      {
+        name: "PRP Therapy Kits",
+        image: "/Specialized-&-Advanced-Medical-Kits.png",
+        description: "Platelet-Rich Plasma therapy systems for regenerative medicine"
+      },
+      {
+        name: "Blood Storage Systems",
+        image: "/Specialized-&-Advanced-Medical-Kits.png",
+        description: "Advanced blood collection and storage solutions"
+      },
+      {
+        name: "Regenerative Medicine",
+        image: "/Specialized-&-Advanced-Medical-Kits.png",
+        description: "Specialized solutions for regenerative medical treatments"
+      }
+    ]
+  }
+];
+---
+
+<Layout title="Our Products - Swiss Trade Ventures" description="Explore our comprehensive range of premium medical equipment and supplies. From patient care consumables to advanced surgical devices, trusted by healthcare professionals worldwide.">
+  <Navbar />
+  <ProductsHero />
+  
+  <!-- Product Categories -->
+  {productCategories.map((category) => (
+    <ProductCategory 
+      title={category.title}
+      description={category.description}
+      products={category.products}
+      viewAllLink={category.viewAllLink}
+      categoryId={category.categoryId}
+    />
+  ))}
+  
+  <ProductsContactCTA />
+  <ContactStrip />
+  <Footer />
+</Layout>

@@ -1,0 +1,72 @@
+---
+// Scalable Product Category Component
+interface Props {
+  title: string;
+  description: string;
+  products: Array<{
+    name: string;
+    image: string;
+    description: string;
+  }>;
+  viewAllLink: string;
+  categoryId: string;
+}
+
+const { title, description, products, viewAllLink, categoryId } = Astro.props;
+---
+
+<section class="relative py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Category Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+        {title}
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        {description}
+      </p>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+      {products.map((product) => (
+        <div class="group cursor-pointer">
+          <div class="bg-gray-50 rounded-2xl p-6 transition-all duration-300 hover:bg-blue-50">
+            <!-- Product Image -->
+            <div class="h-48 mb-6 flex items-center justify-center bg-white rounded-xl">
+              <img 
+                src={product.image} 
+                alt={product.name}
+                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              >
+            </div>
+            
+            <!-- Product Info -->
+            <div class="text-center">
+              <h3 class="text-lg font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
+                {product.name}
+              </h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                {product.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- View All Button -->
+    <div class="text-center">
+      <a 
+        href={viewAllLink}
+        class="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-full transition-all duration-300 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+        style="font-family: 'Space Grotesk', sans-serif;"
+      >
+        View All {title}
+        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
