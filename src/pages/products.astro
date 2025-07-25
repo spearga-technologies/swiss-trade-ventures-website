@@ -246,37 +246,62 @@ const productCategories = [
   
   <!-- Main Content with Sidebar -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="relative">
+    <div class="relative flex gap-8">
       
-      <!-- Fixed Categories Index Sidebar - Right Side -->
-      <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
-        <div class="bg-white rounded-xl p-4 border border-gray-100 max-w-xs">
-          <h3 class="text-sm font-semibold text-gray-800 mb-4 text-left">Categories</h3>
-          <nav class="space-y-1">
-            {productCategories.map((category) => (
-              <a 
-                href={`#${category.categoryId}`}
-                class="category-nav-link block px-3 py-2 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 text-left"
-              >
-                {category.title}
-              </a>
-            ))}
-          </nav>
+      <!-- Categories Index Widget - Left Side -->
+      <div class="hidden lg:block w-80 flex-shrink-0">
+        <div class="sticky top-32">
+          <div class="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-900 mb-6" style="font-family: 'Space Grotesk', sans-serif;">
+              Product Categories
+            </h3>
+            <nav class="space-y-3">
+              {productCategories.map((category) => (
+                <a 
+                  href={`#${category.categoryId}`}
+                  class="category-nav-link flex items-center justify-between p-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
+                >
+                  <span class="font-medium">{category.title}</span>
+                  <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full group-hover:bg-blue-100 group-hover:text-blue-600 transition-all duration-200">
+                    {category.products.length}
+                  </span>
+                </a>
+              ))}
+            </nav>
+            
+            <!-- Total Products Summary -->
+            <div class="mt-6 pt-6 border-t border-gray-100">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-gray-600">Total Products</span>
+                <span class="text-lg font-bold text-blue-600">
+                  {productCategories.reduce((total, category) => total + category.products.length, 0)}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
       <!-- Product Categories Content -->
-      <div class="w-full">
+      <div class="flex-1 min-w-0">
+        {productCategories.map((category) => (
+          <ProductCategory 
+            title={category.title}
+            description={category.description}
+            products={category.products}
+            categoryId={category.categoryId}
+          />
+        ))}
+        
+        <ProductsContactCTA />
+      </div>
       
-      <!-- Fixed Categories Index Sidebar - Right Side -->
-      <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
-        <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 max-w-xs">
-          <h3 class="text-sm font-semibold text-gray-800 mb-4 text-center">Categories</h3>
-          <nav class="space-y-1">
+    </div>
+  </div>
             {productCategories.map((category) => (
               <a 
                 href={`#${category.categoryId}`}
-                class="category-nav-link block px-3 py-2 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 text-center"
+                class="category-nav-link block px-3 py-2 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 text-left"
               >
                 {category.title}
               </a>
@@ -299,13 +324,34 @@ const productCategories = [
         <ProductsContactCTA />
       </div>
       
-      
     </div>
   </div>
   
   <ContactStrip />
   <Footer />
 </Layout>
+
+<script>
+// Smooth scroll to category sections
+document.addEventListener('DOMContentLoaded', function() {
+  const categoryLinks = document.querySelectorAll('.category-nav-link');
+  
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetElement = document.getElementById(targetId);
+      
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+});
+</script>
 
 <script>
 // Smooth scroll to category sections
