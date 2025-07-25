@@ -1,0 +1,392 @@
+---
+// Premium Global Presence Section with Optimized Interactive Globe
+---
+
+<section class="relative py-20 bg-transparent overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+        Our Global Presence
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Connected worldwide with premium partnerships and strategic locations across continents
+      </p>
+    </div>
+
+    <!-- Globe Container -->
+    <div class="relative w-full h-[700px] flex items-center justify-center">
+      <canvas id="globe" class="max-w-full max-h-full"></canvas>
+    </div>
+
+    <!-- Global Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 relative">
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gray-900 mb-2">50+</div>
+        <div class="text-gray-600 text-sm">Countries</div>
+      </div>
+      <!-- Vertical separator line -->
+      <div class="absolute left-1/2 top-0 bottom-0 w-px bg-black/20 md:hidden"></div>
+      
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gray-900 mb-2">200+</div>
+        <div class="text-gray-600 text-sm">Partners</div>
+      </div>
+      <!-- Vertical separator lines for desktop -->
+      <div class="absolute left-1/4 top-0 bottom-0 w-px bg-black/20 hidden md:block"></div>
+      <div class="absolute left-2/4 top-0 bottom-0 w-px bg-black/20 hidden md:block"></div>
+      <div class="absolute left-3/4 top-0 bottom-0 w-px bg-black/20 hidden md:block"></div>
+      
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gray-900 mb-2">24/7</div>
+        <div class="text-gray-600 text-sm">Support</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-gray-900 mb-2">15+</div>
+        <div class="text-gray-600 text-sm">Years Experience</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:global src="https://d3js.org/d3.v5.min.js"></script>
+<script is:global src="https://d3js.org/topojson.v2.min.js"></script>
+
+<script is:global>
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('globe');
+    if (!canvas) return;
+    
+    const context = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    const containerRect = container.getBoundingClientRect();
+    const size = Math.min(containerRect.width, containerRect.height, 700);
+    
+    // High DPI support for crisp rendering
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    canvas.width = size * devicePixelRatio;
+    canvas.height = size * devicePixelRatio;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    context.scale(devicePixelRatio, devicePixelRatio);
+
+    // Optimized Configuration
+    const config = {
+        center: { lon: 76.2673, lat: 9.9312 }, // Ernakulam, Kerala
+        destinations: [
+            { lon: 76.2673, lat: 9.9312, name: 'Ernakulam, Kerala' },
+            { lon: 104.1954, lat: 35.8617, name: 'China' },
+            { lon: 138.2529, lat: 36.2048, name: 'Japan' },
+            { lon: 103.8198, lat: 1.3521, name: 'Singapore' },
+            { lon: 55.296249, lat: 25.276987, name: 'UAE' },
+            { lon: 126.9780, lat: 37.5665, name: 'South Korea' },
+            { lon: 3.3792, lat: 6.5244, name: 'Nigeria' },
+            { lon: -1.0232, lat: 7.9465, name: 'Ghana' },
+            { lon: 22.9375, lat: -30.5595, name: 'South Africa' },
+            { lon: 18.4241, lat: -33.9249, name: 'Cape Town' },
+            { lon: 28.0473, lat: -26.2041, name: 'Johannesburg' },
+            { lon: 36.8219, lat: -1.2921, name: 'Kenya' },
+            { lon: 39.2083, lat: -6.7924, name: 'Tanzania' },
+            { lon: 32.5825, lat: 0.3476, name: 'Uganda' },
+            { lon: 30.0619, lat: -1.9403, name: 'Rwanda' },
+            { lon: 15.2663, lat: -4.0383, name: 'Angola' },
+            { lon: -14.4524, lat: 14.4974, name: 'Senegal' },
+            { lon: 9.0579, lat: 7.5399, name: 'Cameroon' },
+            { lon: 2.1204, lat: 13.5137, name: 'Niger' },
+            { lon: 31.2357, lat: 30.0444, name: 'Egypt' },
+            { lon: 38.7578, lat: 9.0250, name: 'Ethiopia' },
+            { lon: 47.5079, lat: -18.8792, name: 'Madagascar' },
+            { lon: -0.1276, lat: 51.5072, name: 'UK' },
+            { lon: 2.2137, lat: 46.2276, name: 'France' },
+            { lon: 13.4050, lat: 52.5200, name: 'Germany' },
+            { lon: 37.6173, lat: 55.7558, name: 'Russia' },
+            { lon: -98.5795, lat: 39.8283, name: 'USA' },
+            { lon: -75.6972, lat: 45.4215, name: 'Canada' },
+            { lon: -51.9253, lat: -14.2350, name: 'Brazil' },
+            { lon: -58.3816, lat: -34.6037, name: 'Argentina' },
+            { lon: 151.2093, lat: -33.8688, name: 'Australia' }
+        ],
+        colors: {
+            ocean: '#f1f5f9',
+            land: '#ffffff',
+            destination: '#0003ff',
+            centerPoint: '#0003ff',
+            flowLine: '#0003ff'
+        },
+        globeScale: 0.7,
+        flowSpeed: 0.012,
+        maxLines: 5,
+        spawnInterval: 1200
+    };
+
+    // Optimized projection
+    const projection = d3.geoOrthographic()
+        .scale(size * config.globeScale)
+        .translate([size / 2, size / 2])
+        .clipAngle(90)
+        .rotate([-config.center.lon, -config.center.lat]);
+
+    const path = d3.geoPath().projection(projection).context(context);
+    
+    let world = null;
+    const flowingLines = [];
+    let lastSpawnTime = 0;
+    let animationId = null;
+
+    // Load world data
+    d3.json('https://unpkg.com/world-atlas@2.0.2/countries-110m.json').then(data => {
+        world = topojson.feature(data, data.objects.countries);
+        startAnimation();
+    });
+
+    // Smooth drag interaction
+    let isDragging = false;
+    let lastRotation = projection.rotate();
+    
+    const drag = d3.drag()
+        .container(canvas)
+        .subject(() => {
+            const r = projection.rotate();
+            return { x: r[0] / 0.5, y: -r[1] / 0.5 };
+        })
+        .on("start", () => {
+            isDragging = true;
+            canvas.style.cursor = 'grabbing';
+        })
+        .on("drag", () => {
+            const rotation = [
+                lastRotation[0] + d3.event.dx * 0.5,
+                Math.max(-60, Math.min(60, lastRotation[1] - d3.event.dy * 0.5))
+            ];
+            projection.rotate(rotation);
+            lastRotation = rotation;
+        })
+        .on("end", () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+
+    d3.select(canvas).call(drag);
+
+    // Optimized animation loop
+    function startAnimation() {
+        function animate(timestamp) {
+            // Spawn new lines
+            if (timestamp - lastSpawnTime > config.spawnInterval && flowingLines.length < config.maxLines) {
+                spawnLine();
+                lastSpawnTime = timestamp;
+            }
+
+            // Force spawn if too few lines
+            if (flowingLines.length < 2 && timestamp - lastSpawnTime > config.spawnInterval * 0.6) {
+                spawnLine();
+                lastSpawnTime = timestamp;
+            }
+
+            render(timestamp);
+            animationId = requestAnimationFrame(animate);
+        }
+        animationId = requestAnimationFrame(animate);
+    }
+
+    // Spawn flowing line
+    function spawnLine() {
+        if (flowingLines.length >= config.maxLines) return;
+        
+        const randomDest = config.destinations[Math.floor(Math.random() * config.destinations.length)];
+        const interpolator = d3.geoInterpolate([config.center.lon, config.center.lat], [randomDest.lon, randomDest.lat]);
+        
+        flowingLines.push({
+            interpolator: interpolator,
+            progress: 0,
+            id: Date.now() + Math.random()
+        });
+    }
+
+    // Optimized render function
+    function render(timestamp) {
+        context.clearRect(0, 0, size, size);
+
+        // Draw ocean
+        context.beginPath();
+        path({ type: 'Sphere' });
+        context.fillStyle = config.colors.ocean;
+        context.fill();
+
+        // Draw land
+        if (world) {
+            context.beginPath();
+            path(world);
+            context.fillStyle = config.colors.land;
+            context.fill();
+        }
+
+        // Draw destination points
+        context.fillStyle = config.colors.destination;
+        config.destinations.forEach(dest => {
+            const point = projection([dest.lon, dest.lat]);
+            if (point && isVisible([dest.lon, dest.lat])) {
+                context.beginPath();
+                context.arc(point[0], point[1], 3, 0, 2 * Math.PI);
+                context.fill();
+                
+                context.beginPath();
+                context.arc(point[0], point[1], 1.5, 0, 2 * Math.PI);
+                context.fillStyle = '#ffffff';
+                context.fill();
+                context.fillStyle = config.colors.destination;
+            }
+        });
+
+        // Draw flowing lines
+        drawFlowingLines(timestamp);
+
+        // Draw center point with pulse
+        drawCenterPoint(timestamp);
+    }
+
+    // Optimized flowing lines
+    function drawFlowingLines(timestamp) {
+        context.lineWidth = 2;
+        context.lineCap = 'round';
+        
+        for (let i = flowingLines.length - 1; i >= 0; i--) {
+            const line = flowingLines[i];
+            line.progress += config.flowSpeed;
+            
+            if (line.progress > 1) {
+                flowingLines.splice(i, 1);
+                continue;
+            }
+            
+            drawLine(line);
+        }
+    }
+
+    // Draw individual line
+    function drawLine(line) {
+        const segmentLength = 0.15;
+        const startProgress = Math.max(0, line.progress - segmentLength);
+        const endProgress = line.progress;
+        
+        const points = [];
+        for (let i = 0; i <= 20; i++) {
+            const t = startProgress + (endProgress - startProgress) * (i / 20);
+            if (t >= 0 && t <= 1) {
+                const coords = line.interpolator(t);
+                const point = projection(coords);
+                if (point && isVisible(coords)) {
+                    points.push(point);
+                }
+            }
+        }
+        
+        if (points.length > 1) {
+            context.beginPath();
+            context.moveTo(points[0][0], points[0][1]);
+            for (let i = 1; i < points.length; i++) {
+                context.lineTo(points[i][0], points[i][1]);
+            }
+            
+            const gradient = context.createLinearGradient(
+                points[0][0], points[0][1],
+                points[points.length - 1][0], points[points.length - 1][1]
+            );
+            gradient.addColorStop(0, 'rgba(0, 3, 255, 0.1)');
+            gradient.addColorStop(0.5, 'rgba(0, 3, 255, 0.6)');
+            gradient.addColorStop(1, 'rgba(0, 3, 255, 1)');
+            
+            context.strokeStyle = gradient;
+            context.stroke();
+        }
+    }
+
+    // Draw center point with smooth pulse
+    function drawCenterPoint(timestamp) {
+        const centerPoint = projection([config.center.lon, config.center.lat]);
+        if (!centerPoint || !isVisible([config.center.lon, config.center.lat])) return;
+        
+        const time = timestamp / 1000;
+        
+        // Smooth pulse rings
+        for (let i = 0; i < 3; i++) {
+            const offset = i * 0.3;
+            const pulse = 8 + Math.sin(time * 0.8 + offset) * 4;
+            const opacity = (1 - Math.abs(Math.sin(time * 0.8 + offset))) * 0.2;
+            
+            context.beginPath();
+            context.arc(centerPoint[0], centerPoint[1], pulse + i * 3, 0, 2 * Math.PI);
+            context.fillStyle = `rgba(0, 3, 255, ${opacity})`;
+            context.fill();
+        }
+
+        // Main center point
+        context.beginPath();
+        context.arc(centerPoint[0], centerPoint[1], 6, 0, 2 * Math.PI);
+        context.fillStyle = config.colors.centerPoint;
+        context.fill();
+        
+        context.beginPath();
+        context.arc(centerPoint[0], centerPoint[1], 3, 0, 2 * Math.PI);
+        context.fillStyle = '#ffffff';
+        context.fill();
+    }
+
+    // Optimized visibility check
+    function isVisible(coords) {
+        const [lambda, phi] = coords;
+        const rotate = projection.rotate();
+        
+        const cosPhi = Math.cos(phi * Math.PI / 180);
+        const x = cosPhi * Math.cos((lambda + rotate[0]) * Math.PI / 180);
+        const y = cosPhi * Math.sin((lambda + rotate[0]) * Math.PI / 180);
+        const z = Math.sin(phi * Math.PI / 180);
+        
+        const cosRotPhi = Math.cos(-rotate[1] * Math.PI / 180);
+        const sinRotPhi = Math.sin(-rotate[1] * Math.PI / 180);
+        
+        return z * cosRotPhi - y * sinRotPhi > 0;
+    }
+
+    // Optimized resize handler
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const newRect = container.getBoundingClientRect();
+            const newSize = Math.min(newRect.width, newRect.height, 700);
+            
+            if (Math.abs(newSize - size) < 10) return;
+            
+            canvas.width = newSize * devicePixelRatio;
+            canvas.height = newSize * devicePixelRatio;
+            canvas.style.width = newSize + 'px';
+            canvas.style.height = newSize + 'px';
+            context.scale(devicePixelRatio, devicePixelRatio);
+            
+            projection
+                .scale(newSize * config.globeScale)
+                .translate([newSize / 2, newSize / 2]);
+        }, 150);
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+    });
+});
+</script>
+
+<style>
+#globe {
+    cursor: grab;
+    border-radius: 50%;
+    transition: transform 0.1s ease-out;
+}
+
+#globe:active {
+    cursor: grabbing;
+}
+</style>
