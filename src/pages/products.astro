@@ -7,98 +7,234 @@ import ProductsContactCTA from '../components/ProductsContactCTA.astro';
 import ContactStrip from '../components/ContactStrip.astro';
 import Footer from '../components/Footer.astro';
 
-// Product data for each category
+// Comprehensive Product Data
 const productCategories = [
   {
-    title: "Patient Care & General Medical Consumables",
-    description: "Essential medical supplies for patient care and general healthcare needs",
-    categoryId: "patient-care",
-    viewAllLink: "/products/patient-care",
+    title: "Condoms",
+    description: "Premium quality male condoms for safe and reliable protection",
+    categoryId: "condoms",
     products: [
-      {
-        name: "Sterile Surgical Gloves",
-        image: "/Patient-Care-&-General-Medical-Consumables.png",
-        description: "Premium latex and nitrile gloves for surgical procedures"
-      },
-      {
-        name: "IV Cannula Systems",
-        image: "/Patient-Care-&-General-Medical-Consumables.png",
-        description: "Complete intravenous cannula and infusion systems"
-      },
-      {
-        name: "Wound Care Solutions",
-        image: "/Patient-Care-&-General-Medical-Consumables.png",
-        description: "Advanced wound care and bandaging solutions"
-      }
+      { name: "Male Condoms", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Male Condoms", image: "/Patient-Care-&-General-Medical-Consumables.png" }
     ]
   },
   {
-    title: "Diagnostic & Laboratory Supplies",
-    description: "Comprehensive diagnostic tools and laboratory equipment for accurate testing",
-    categoryId: "diagnostic-lab",
-    viewAllLink: "/products/diagnostic-lab",
+    title: "Gloves",
+    description: "Sterile surgical and examination gloves for medical procedures",
+    categoryId: "gloves",
     products: [
-      {
-        name: "IVD Testing Kits",
-        image: "/Diagnostic-&-Laboratory-Supplies.png",
-        description: "In-vitro diagnostic kits for pregnancy, malaria, HIV testing"
-      },
-      {
-        name: "Laboratory Consumables",
-        image: "/Diagnostic-&-Laboratory-Supplies.png",
-        description: "Sample containers and laboratory testing supplies"
-      },
-      {
-        name: "Blood Collection Systems",
-        image: "/Diagnostic-&-Laboratory-Supplies.png",
-        description: "Complete blood collection and storage systems"
-      }
+      { name: "Sterile Surgical Gloves", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Examination Gloves", image: "/Patient-Care-&-General-Medical-Consumables.png" }
     ]
   },
   {
-    title: "Surgical & Implantable Devices",
-    description: "Advanced surgical instruments and implantable medical devices",
-    categoryId: "surgical-devices",
-    viewAllLink: "/products/surgical-devices",
+    title: "Cannulas",
+    description: "Complete range of I.V. cannulas in various gauges for intravenous access",
+    categoryId: "cannulas",
     products: [
-      {
-        name: "Premium Sutures",
-        image: "/Surgical-mesh-&-implantable-stents.png",
-        description: "High-quality sutures in multiple materials and sizes"
-      },
-      {
-        name: "Surgical Mesh",
-        image: "/Surgical-mesh-&-implantable-stents.png",
-        description: "Biocompatible surgical mesh for various procedures"
-      },
-      {
-        name: "Implantable Stents",
-        image: "/Surgical-mesh-&-implantable-stents.png",
-        description: "Advanced stent systems for cardiovascular procedures"
-      }
+      { name: "I.V. Cannulas (14G)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "I.V. Cannulas (16G)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "I.V. Cannulas (18G)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "I.V. Cannulas (20G)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "I.V. Cannulas (22G)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "I.V. Cannulas (24G)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "I.V. Cannulas (26G)", image: "/Patient-Care-&-General-Medical-Consumables.png" }
     ]
   },
   {
-    title: "Specialized & Advanced Medical Kits",
-    description: "Cutting-edge medical kits for specialized treatments and procedures",
-    categoryId: "specialized-kits",
-    viewAllLink: "/products/specialized-kits",
+    title: "Syringes",
+    description: "Disposable syringes and AD syringes in multiple volumes for medical injections",
+    categoryId: "syringes",
     products: [
-      {
-        name: "PRP Therapy Kits",
-        image: "/Specialized-&-Advanced-Medical-Kits.png",
-        description: "Platelet-Rich Plasma therapy systems for regenerative medicine"
-      },
-      {
-        name: "Blood Storage Systems",
-        image: "/Specialized-&-Advanced-Medical-Kits.png",
-        description: "Advanced blood collection and storage solutions"
-      },
-      {
-        name: "Regenerative Medicine",
-        image: "/Specialized-&-Advanced-Medical-Kits.png",
-        description: "Specialized solutions for regenerative medical treatments"
-      }
+      { name: "Disposable Syringe (1ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe with needle (2ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe with needle (2.5ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe (3ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe with needle (5ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe with needle (10ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe with needle (20ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Disposable Syringe with needle (50ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "AD Syringe (0.5ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "AD Syringe (2ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "AD Syringe (5ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "AD Syringe (10ml)", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "Needles",
+    description: "Hypodermic needles in various gauges for precise medical procedures",
+    categoryId: "needles",
+    products: [
+      { name: "Hypodermic Needle 16G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 18G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 19G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 20G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 21G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 22G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 23G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 24G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 25G", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Hypodermic Needle 26G", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "Sutures",
+    description: "Premium surgical sutures including Violet, Acid Violet, Nylon Blue, Silk Black, and surgical mesh",
+    categoryId: "sutures",
+    products: [
+      { name: "Violet USP 0, 75cm 1/2 Round Body 40mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 0, 75cm 1/2 Reverse Cutting 48mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 1, 75cm 1/2 Reverse Cutting 48mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 2, 75cm 1/2 Reverse Cutting 48mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 2-0, 75cm 1/2 Round Body 40mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 2-0, 75cm 1/2 Reverse Cutting 48mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 2-0, 75cm 3/8C Reverse Cutting 26mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Violet USP 3-0, 75cm 3/8C Reverse Cutting 26mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Acid Violet USP 0, 75cm 1/2C Round Body 40mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Nylon Blue USP 1, 75cm 3/8C Reverse Cutting 45mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Silk Black USP 1, 75cm 1/2C Reverse Cutting 45mm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Bone Wax 2.5g", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Mesh 6cm x 11cm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Mesh 15cm x 15cm", image: "/Surgical-mesh-&-implantable-stents.png" },
+      { name: "Mesh 30cm x 30cm", image: "/Surgical-mesh-&-implantable-stents.png" }
+    ]
+  },
+  {
+    title: "Bandages",
+    description: "Polyurethane casting bandages, conforming bandages, and alcohol prep swabs",
+    categoryId: "bandages",
+    products: [
+      { name: "Polyurethane Casting Bandage, 2\", Blue", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Polyurethane Casting Bandage, 2\", Red", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Polyurethane Casting Bandage, 3\", Blue", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Polyurethane Casting Bandage, 4\", Blue", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Polyurethane Casting Bandage, 6\", Green", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Alcohol Prep Swabs (100s/box)", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Conforming Bandage 10cm × 4.5M", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Conforming Bandage 15cm × 4.5M", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Conforming Bandage 5cm × 4.5M", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "Cotton",
+    description: "Medical grade cotton products for wound care and medical procedures",
+    categoryId: "cotton",
+    products: [
+      { name: "Cotton Roll 500g", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Dressing Pack Medium Sterile", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "Gauze",
+    description: "Sterile and non-sterile gauze products for wound care and surgical procedures",
+    categoryId: "gauze",
+    products: [
+      { name: "Gauze Bandage 10cm", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Gauze Roll 10cm", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Gauze Swab 10×10cm N/Sterile 8 ply", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Gauze Swab 5×5cm N/Sterile 8 ply", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Gauze Swabs Sterile 10×10cm 8ply", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Gauze Swab Sterile 5×5cm 8 ply", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "IV Cannula Fixator Transparent", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Lap Sponge X-ray Gauze 30×30cm 16ply", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Non Woven Wound Dressing 6×7cm", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Spot Bandage Sterile (100s/pkt)", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "Tape",
+    description: "Surgical paper and transparent tapes for medical applications",
+    categoryId: "tape",
+    products: [
+      { name: "Tape, Surgical Paper 1.25cm × 9M", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Tape, Surgical Paper 2.5cm × 9M", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Tape, Surgical Paper 5cm × 9M", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Tape, Surgical Transparent 5cm × 9M", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "Plaster",
+    description: "Zinc oxide adhesive plasters for wound protection and medical applications",
+    categoryId: "plaster",
+    products: [
+      { name: "Zinc Oxide Adhesive Plaster 2.5cm", image: "/Patient-Care-&-General-Medical-Consumables.png" },
+      { name: "Zinc Oxide Adhesive Plaster 5cm × 4.5 yd", image: "/Patient-Care-&-General-Medical-Consumables.png" }
+    ]
+  },
+  {
+    title: "IVD Kit",
+    description: "In-vitro diagnostic kits for various medical testing and screening",
+    categoryId: "ivd-kit",
+    products: [
+      { name: "Pregnancy Kit", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Malaria Kit", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Syphilis Kit", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Hepatitis B (HbsAg)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Hepatitis C (HCV)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "LH Ovulation Kit", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Typhoid", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "HIV 1/2", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Viral Transport Medium Test", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "HIV/Syphilis Combo", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Anti-D IgG/IgM Monoclonal", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Anti-D NSI", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Anti-D Combo", image: "/Diagnostic-&-Laboratory-Supplies.png" }
+    ]
+  },
+  {
+    title: "Lab Products",
+    description: "Comprehensive laboratory supplies and equipment for medical testing",
+    categoryId: "lab-products",
+    products: [
+      { name: "Blood Lancets (200s/pkt)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Blue Tips 1000ul - LDP", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Centrifuge Tube 12ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Centrifuge Tube 15ml W/cap", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Cover Glass 22×22mm", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "CRP Latex (100 tests)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Demineralised Water 20ltr", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "HBsAg", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Hitachi Sample Cups 500/pkt", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Malaria PF/PV (25 Test)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Micro ESR Vacuum Tube 1.28ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Microscope Slide Clear", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Microscope Slide Frosted", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Microtest Tube Eppendorf 1.5ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Microtitre Plate 96 U Shape", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Pasteur Pipette 1ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Pasteur Pipette 3ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "RPR Latex (100 Tests)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Sodium Citrate Tube 20 Pc", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Stool Container 60ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Syphilis Test Kit (40 Tests)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Test Tube 5ml, 12×75mm", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Urine Container 60ml", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Urine Container 60ml Sterile", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Vaccutainer Tube 3ml Purple EDTA", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Vaccutainer Tube Red 4ml Plain", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Vaccutainer Tube Yellow Gel", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Variable Pipette (10-100ul)", image: "/Diagnostic-&-Laboratory-Supplies.png" },
+      { name: "Blood Tube", image: "/Diagnostic-&-Laboratory-Supplies.png" }
+    ]
+  },
+  {
+    title: "New Products",
+    description: "Latest innovative medical products and advanced healthcare solutions",
+    categoryId: "new-products",
+    products: [
+      { name: "PRP Kits", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Urology Catheters", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Spinal Needles (18G to 27G)", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Blood Bags", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Stents", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Pen Type I.V. Cannula", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "AV Fistula Needles", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Blood Transfusion Set", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "IV Infusion Set", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "IV Fixator", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Suction Catheters", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Urine Collection Bag", image: "/Specialized-&-Advanced-Medical-Kits.png" },
+      { name: "Medical Textile Products", image: "/Specialized-&-Advanced-Medical-Kits.png" }
     ]
   }
 ];
@@ -114,7 +250,6 @@ const productCategories = [
       title={category.title}
       description={category.description}
       products={category.products}
-      viewAllLink={category.viewAllLink}
       categoryId={category.categoryId}
     />
   ))}
