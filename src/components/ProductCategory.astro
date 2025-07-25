@@ -76,37 +76,17 @@ const { title, description, products, categoryId } = Astro.props;
 
 <style>
 .product-card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .product-card:hover {
-  box-shadow: 0 10px 25px rgba(0, 3, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 3, 255, 0.08);
   border-color: rgba(0, 3, 255, 0.1);
+  transform: translateY(-2px);
 }
 
-/* Staggered animation effect */
-.group:nth-child(1) .product-card { animation-delay: 0ms; }
-.group:nth-child(2) .product-card { animation-delay: 50ms; }
-.group:nth-child(3) .product-card { animation-delay: 100ms; }
-.group:nth-child(4) .product-card { animation-delay: 150ms; }
-.group:nth-child(5) .product-card { animation-delay: 200ms; }
-.group:nth-child(6) .product-card { animation-delay: 250ms; }
-.group:nth-child(7) .product-card { animation-delay: 300ms; }
-.group:nth-child(8) .product-card { animation-delay: 350ms; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .product-card {
-    animation: fadeInUp 0.6s ease-out forwards;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
 }
 </style>

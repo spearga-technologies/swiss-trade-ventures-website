@@ -246,36 +246,27 @@ const productCategories = [
   
   <!-- Main Content with Sidebar -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col lg:flex-row gap-8">
+    <div class="relative">
       
-      <!-- Category Index Sidebar -->
-      <div class="lg:w-80 flex-shrink-0">
-        <div class="sticky top-32">
-          <div class="bg-gray-50 rounded-2xl p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-6" style="font-family: 'Space Grotesk', sans-serif;">
-              Product Categories
-            </h3>
-            <nav class="space-y-2">
-              {productCategories.map((category) => (
-                <a 
-                  href={`#${category.categoryId}`}
-                  class="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all duration-300 text-sm font-medium group"
-                >
-                  <div class="flex items-center justify-between">
-                    <span>{category.title}</span>
-                    <span class="text-xs text-gray-400 group-hover:text-blue-400">
-                      {category.products.length}
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </nav>
-          </div>
+      <!-- Minimal Category Index Sidebar - Right Side -->
+      <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 max-w-xs">
+          <h3 class="text-sm font-semibold text-gray-800 mb-4 text-center">Categories</h3>
+          <nav class="space-y-1">
+            {productCategories.map((category) => (
+              <a 
+                href={`#${category.categoryId}`}
+                class="block px-3 py-2 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 text-center"
+              >
+                {category.title}
+              </a>
+            ))}
+          </nav>
         </div>
       </div>
 
       <!-- Product Categories Content -->
-      <div class="flex-1">
+      <div class="w-full">
         {productCategories.map((category) => (
           <ProductCategory 
             title={category.title}
