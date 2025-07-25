@@ -1,99 +1,115 @@
 ---
-// Premium Catalogue Request Form Component
+// Premium Catalogue Request Form Component - Redesigned
 ---
 
-<section class="relative py-20 bg-white">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Section Header -->
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+<section class="relative py-24 bg-white">
+  <!-- Subtle background pattern -->
+  <div class="absolute inset-0 opacity-5">
+    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(0,3,255,0.15) 1px, transparent 0); background-size: 20px 20px;"></div>
+  </div>
+  
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <!-- Premium Section Header -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6" style="font-family: 'Space Grotesk', sans-serif;">
         Get Your Free Catalogue
       </h2>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
         Fill in your details below and we'll send you our comprehensive medical equipment catalogue instantly.
       </p>
     </div>
 
-    <!-- Form Container -->
-    <div class="max-w-2xl mx-auto">
-      <div class="bg-white border-2 rounded-3xl p-8 lg:p-12 shadow-xl" style="border-color: #0003ff;">
-        <form id="catalogueForm" class="space-y-6">
+    <!-- Premium Form Container -->
+    <div class="max-w-3xl mx-auto">
+      <div class="bg-gradient-to-br from-white to-gray-50/50 rounded-3xl p-8 lg:p-12 shadow-2xl backdrop-blur-sm">
+        <form id="catalogueForm" class="space-y-8">
+          
           <!-- Required Fields Section -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Name Field -->
-            <div>
-              <label for="name" class="block text-sm font-semibold text-gray-700 mb-3">
-                Full Name <span class="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                id="name" 
-                name="name" 
-                required
-                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400"
-                placeholder="Enter your full name"
-              >
-            </div>
+          <div class="space-y-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center" style="font-family: 'Space Grotesk', sans-serif;">
+              <div class="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full mr-3"></div>
+              Required Information
+            </h3>
             
-            <!-- Email Field -->
-            <div>
-              <label for="email" class="block text-sm font-semibold text-gray-700 mb-3">
-                Email Address <span class="text-red-500">*</span>
-              </label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                required
-                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400"
-                placeholder="Enter your email address"
-              >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Name Field -->
+              <div class="space-y-3">
+                <label for="name" class="block text-sm font-semibold text-gray-700">
+                  Full Name <span class="text-red-500 ml-1">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  name="name" 
+                  required
+                  class="w-full px-6 py-4 bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 shadow-sm hover:shadow-md"
+                  placeholder="Enter your full name"
+                >
+              </div>
+              
+              <!-- Email Field -->
+              <div class="space-y-3">
+                <label for="email" class="block text-sm font-semibold text-gray-700">
+                  Email Address <span class="text-red-500 ml-1">*</span>
+                </label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  required
+                  class="w-full px-6 py-4 bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 shadow-sm hover:shadow-md"
+                  placeholder="Enter your email address"
+                >
+              </div>
             </div>
           </div>
 
           <!-- Optional Fields Section -->
-          <div class="pt-4 border-t border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-700 mb-4">Additional Information (Optional)</h3>
+          <div class="space-y-6 pt-8 border-t border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center" style="font-family: 'Space Grotesk', sans-serif;">
+              <div class="w-1 h-6 bg-gradient-to-b from-gray-400 to-gray-500 rounded-full mr-3"></div>
+              Additional Information <span class="text-sm font-normal text-gray-500 ml-2">(Optional)</span>
+            </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Company Field -->
-              <div>
-                <label for="company" class="block text-sm font-medium text-gray-600 mb-3">
+              <div class="space-y-3">
+                <label for="company" class="block text-sm font-medium text-gray-600">
                   Company Name
                 </label>
                 <input 
                   type="text" 
                   id="company" 
                   name="company"
-                  class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400"
+                  class="w-full px-6 py-4 bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 shadow-sm hover:shadow-md"
                   placeholder="Enter your company name"
                 >
               </div>
               
               <!-- Phone Field -->
-              <div>
-                <label for="phone" class="block text-sm font-medium text-gray-600 mb-3">
+              <div class="space-y-3">
+                <label for="phone" class="block text-sm font-medium text-gray-600">
                   Phone Number
                 </label>
                 <input 
                   type="tel" 
                   id="phone" 
                   name="phone"
-                  class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400"
+                  class="w-full px-6 py-4 bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 shadow-sm hover:shadow-md"
                   placeholder="Enter your phone number"
                 >
               </div>
             </div>
 
             <!-- Country Field -->
-            <div class="mt-6">
-              <label for="country" class="block text-sm font-medium text-gray-600 mb-3">
+            <div class="space-y-3">
+              <label for="country" class="block text-sm font-medium text-gray-600">
                 Country
               </label>
               <select 
                 id="country" 
                 name="country"
-                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white"
+                class="w-full px-6 py-4 bg-white rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 text-gray-900 shadow-sm hover:shadow-md"
               >
                 <option value="">Select your country</option>
                 <option value="US">United States</option>
@@ -120,29 +136,32 @@
             </div>
           </div>
           
-          <!-- Submit Button -->
+          <!-- Premium Submit Button -->
           <div class="pt-8">
             <button 
               type="submit" 
-              class="w-full py-4 px-8 text-white font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/50 hover:shadow-lg transform hover:-translate-y-0.5 text-lg" 
-              style="background-color: #0003ff;" 
-              onmouseover="this.style.backgroundColor='#0002e6'" 
-              onmouseout="this.style.backgroundColor='#0003ff'"
+              class="w-full py-5 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/30 hover:shadow-xl transform hover:-translate-y-1 text-lg group" 
+              style="font-family: 'Space Grotesk', sans-serif;"
             >
-              Get Free Catalogue Now
+              <span class="flex items-center justify-center">
+                Get Free Catalogue Now
+                <svg class="ml-3 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </span>
             </button>
           </div>
         </form>
         
-        <!-- Direct Download Link -->
-        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-          <p class="text-sm text-gray-500 mb-3">Or download instantly:</p>
+        <!-- Subtle Direct Download Link -->
+        <div class="mt-12 pt-8 border-t border-gray-100 text-center">
+          <p class="text-sm text-gray-400 mb-3">Or download instantly:</p>
           <a 
             href="/catalogue.pdf" 
-            class="text-sm text-gray-400 hover:text-blue-600 transition-colors duration-200 inline-flex items-center" 
+            class="text-sm text-gray-400 hover:text-blue-500 transition-colors duration-300 inline-flex items-center group" 
             download
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 mr-2 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
             Download catalogue directly
@@ -180,16 +199,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Simulate form submission
     const button = form.querySelector('button[type="submit"]');
-    const originalText = button.textContent;
+    const originalHTML = button.innerHTML;
     
-    button.textContent = 'Sending...';
+    button.innerHTML = `
+      <span class="flex items-center justify-center">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Sending...
+      </span>
+    `;
     button.disabled = true;
-    button.style.opacity = '0.7';
+    button.style.opacity = '0.8';
     
     setTimeout(() => {
       alert('Thank you! Your catalogue request has been submitted successfully. You will receive it via email shortly.');
       form.reset();
-      button.textContent = originalText;
+      button.innerHTML = originalHTML;
       button.disabled = false;
       button.style.opacity = '1';
     }, 2000);
@@ -199,14 +226,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const inputs = form.querySelectorAll('input, select');
   inputs.forEach(input => {
     input.addEventListener('focus', function() {
-      this.style.borderColor = '#0003ff';
-      this.style.boxShadow = '0 0 0 3px rgba(0, 3, 255, 0.1)';
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 10px 25px rgba(0, 3, 255, 0.1)';
     });
     
     input.addEventListener('blur', function() {
+      this.style.transform = 'translateY(0)';
       if (!this.value) {
-        this.style.borderColor = '#e5e7eb';
-        this.style.boxShadow = 'none';
+        this.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
       }
     });
   });
@@ -216,7 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
 /* Enhanced form styling */
 input:focus, select:focus {
-  box-shadow: 0 0 0 3px rgba(0, 3, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 3, 255, 0.1), 0 0 0 4px rgba(0, 3, 255, 0.1);
 }
 
 /* Smooth transitions for all form elements */
@@ -224,26 +252,25 @@ input, select, button {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Required field styling */
-.text-red-500 {
-  color: #ef4444;
-}
-
 /* Button hover effects */
 button[type="submit"]:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 3, 255, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 3, 255, 0.3);
 }
 
 button[type="submit"]:disabled {
-  opacity: 0.7;
+  opacity: 0.8;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Form container styling */
-form {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
+/* Premium gradient background */
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, #ffffff 0%, rgba(248, 250, 252, 0.5) 100%);
+}
+
+/* Subtle pattern overlay */
+.absolute.inset-0.opacity-5 {
+  pointer-events: none;
 }
 </style>
