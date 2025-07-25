@@ -8,7 +8,7 @@ const { title, description = "Premium website built with Astro 5.12" } = Astro.p
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth" style="overflow-x: hidden;">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -20,7 +20,7 @@ const { title, description = "Premium website built with Astro 5.12" } = Astro.p
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
   </head>
-  <body class="font-sans antialiased">
+  <body class="font-sans antialiased" style="overflow-x: hidden;">
     <slot />
   </body>
 </html>
