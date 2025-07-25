@@ -250,6 +250,26 @@ const productCategories = [
       
       <!-- Fixed Categories Index Sidebar - Right Side -->
       <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
+        <div class="bg-white rounded-xl p-4 border border-gray-100 max-w-xs">
+          <h3 class="text-sm font-semibold text-gray-800 mb-4 text-left">Categories</h3>
+          <nav class="space-y-1">
+            {productCategories.map((category) => (
+              <a 
+                href={`#${category.categoryId}`}
+                class="category-nav-link block px-3 py-2 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 text-left"
+              >
+                {category.title}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </div>
+      
+      <!-- Product Categories Content -->
+      <div class="w-full">
+      
+      <!-- Fixed Categories Index Sidebar - Right Side -->
+      <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
         <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 max-w-xs">
           <h3 class="text-sm font-semibold text-gray-800 mb-4 text-center">Categories</h3>
           <nav class="space-y-1">
@@ -279,12 +299,35 @@ const productCategories = [
         <ProductsContactCTA />
       </div>
       
+      
     </div>
   </div>
   
   <ContactStrip />
   <Footer />
 </Layout>
+
+<script>
+// Smooth scroll to category sections
+document.addEventListener('DOMContentLoaded', function() {
+  const categoryLinks = document.querySelectorAll('.category-nav-link');
+  
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetElement = document.getElementById(targetId);
+      
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+});
+</script>
 
 <script>
 // Smooth scroll to category sections
