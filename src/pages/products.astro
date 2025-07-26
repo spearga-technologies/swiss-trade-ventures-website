@@ -343,15 +343,60 @@ const totalProducts = dummyProducts.length;
       
       <!-- Left Sidebar - Fixed Categories Index -->
       <aside class="fixed left-0 top-32 w-80 z-30 p-6 h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block">
-        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6" style="border: 1px solid #0003ff;">
+        <div class="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20 backdrop-blur-xl rounded-3xl p-6 shadow-xl" style="border: 2px solid #0003ff; box-shadow: 0 25px 50px -12px rgba(0, 3, 255, 0.15);">
           <!-- Sidebar Header -->
           <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
-              Product Categories
-            </h2>
+            <div class="flex items-center mb-4">
+              <div class="w-3 h-3 rounded-full mr-3" style="background: linear-gradient(135deg, #0003ff, #4f46e5);"></div>
+              <h2 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">
+                Product Categories
+              </h2>
+            </div>
+            <div class="w-full h-px bg-gradient-to-r from-blue-200 via-blue-400 to-transparent mb-4"></div>
             <p class="text-sm text-gray-600">
-              Browse our medical equipment categories
+              Browse our premium medical equipment
             </p>
+          </div>
+
+          <!-- Stats Card -->
+          <div class="mb-6 p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-blue-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-2xl font-bold" style="color: #0003ff;">{categoryAnchors.length}</div>
+                <div class="text-xs text-gray-600">Categories</div>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-gray-900">{totalProducts}</div>
+                <div class="text-xs text-gray-600">Products</div>
+              </div>
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Box -->
+          <div class="mb-6">
+            <div class="relative">
+              <input 
+                type="text" 
+                placeholder="Search categories..." 
+                class="w-full px-4 py-3 pl-10 bg-white/60 backdrop-blur-sm border border-blue-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 text-sm transition-all duration-200"
+                id="categorySearch"
+              >
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Categories Navigation -->
+          <div class="mb-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
+              Product Categories
+            </h3>
           </div>
 
           <!-- Categories Navigation -->
@@ -359,22 +404,76 @@ const totalProducts = dummyProducts.length;
             {categoryAnchors.map((category) => (
               <a 
                 href={`#${category.anchor}`}
-                class="category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent"
-                style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+                class="category-nav-item group flex items-center justify-between p-4 rounded-xl text-gray-700 transition-all duration-300 border border-transparent relative overflow-hidden"
+                style="background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(248,250,252,0.6)); backdrop-filter: blur(10px);"
                 data-category={category.anchor}
-              >
-                <span class="text-sm font-medium truncate pr-2">{category.name}</span>
-                <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-200">
-                  {category.productCount}
-                </span>
+        <div class="flex-shrink-0 hidden md:block">
+                <!-- Hover gradient overlay -->
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+                
+                <!-- Content -->
+                <div class="relative z-10 flex items-center justify-between w-full">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full mr-3 transition-all duration-300" style="background: linear-gradient(135deg, #0003ff, #4f46e5);"></div>
+                    <span class="text-sm font-medium truncate pr-2 group-hover:text-white transition-colors duration-300">{category.name}</span>
+                  </div>
+                  <span class="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white/80 text-gray-700 group-hover:bg-white group-hover:text-blue-600 transition-all duration-300 shadow-sm">
+                    {category.productCount}
+                  </span>
+                </div>
+                
+                <!-- Active indicator -->
+                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-0 bg-white rounded-r-full transition-all duration-300 group-hover:h-8"></div>
               </a>
             ))}
           </nav>
 
+          <!-- Bottom Action -->
+          <div class="mt-8 pt-6 border-t border-blue-100">
+            <a 
+              href="/request-catalogue" 
+              class="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Download Catalogue
+            </a>
+          </div>
         </div>
       </aside>
 
-      <!-- Mobile Categories Toggle -->
+      <!-- Mobile Categories Toggle Button -->
+      <button 
+        id="mobileCategoriesToggle"
+        class="lg:hidden fixed top-40 left-4 z-40 w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center transform hover:scale-105"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+        </svg>
+      </button>
+
+      <!-- Mobile Bottom Navigation Bar -->
+      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t shadow-lg" style="border-color: rgba(0, 3, 255, 0.1);">
+        <div class="px-4 py-3">
+          <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {categoryAnchors.map((category) => (
+              <a 
+                href={`#${category.anchor}`}
+                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-gradient-to-r from-white to-gray-50 rounded-full text-sm font-medium text-gray-700 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                style="border: 1px solid rgba(0, 3, 255, 0.2);"
+                data-category={category.anchor}
+              >
+                <span class="whitespace-nowrap">{category.name}</span>
+                <span class="ml-2 inline-flex items-center justify-center w-5 h-5 bg-blue-100 text-blue-600 rounded-full text-xs font-bold">
+                  {category.productCount}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <!-- Mobile Bottom Navigation Bar -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
         <div class="px-4 py-3">
@@ -385,7 +484,6 @@ const totalProducts = dummyProducts.length;
                 class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200"
                 style="border: 1px solid #0003ff;"
                 data-category={category.anchor}
-              >
                 {category.name}
               </a>
             ))}
@@ -432,13 +530,63 @@ const totalProducts = dummyProducts.length;
           
           <!-- Page Header -->
           <div class="mb-8 lg:mb-12">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 lg:p-12" style="border: 1px solid #0003ff;">
+            <div class="bg-gradient-to-br from-blue-50 via-indigo-50/50 to-purple-50/30 rounded-3xl p-8 lg:p-12 relative overflow-hidden" style="border: 2px solid #0003ff; box-shadow: 0 25px 50px -12px rgba(0, 3, 255, 0.1);">
+              <!-- Decorative elements -->
+              <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+              <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-200/30 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <div class="relative z-10">
+                <div class="flex items-center mb-6">
+                  <div class="w-4 h-4 rounded-full mr-4" style="background: linear-gradient(135deg, #0003ff, #4f46e5);"></div>
+                  <span class="text-sm font-semibold text-blue-600 uppercase tracking-wider">Premium Medical Equipment</span>
+                </div>
+                
               <h1 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight" style="font-family: 'Space Grotesk', sans-serif;">
                 Medical Equipment Products
               </h1>
               <p class="text-lg lg:text-xl text-gray-600 max-w-4xl leading-relaxed mb-8">
                 Discover our comprehensive range of premium medical equipment designed for professional healthcare training and education. Each product meets international quality standards and comes with detailed specifications for optimal learning experiences.
               </p>
+                
+                <!-- Stats Row -->
+                <div class="flex flex-wrap gap-6 mt-8">
+                  <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center mr-3">
+                      <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-2xl font-bold text-gray-900">{totalProducts}+</div>
+                      <div class="text-sm text-gray-600">Products</div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center mr-3">
+                      <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-2xl font-bold text-gray-900">{categoryAnchors.length}</div>
+                      <div class="text-sm text-gray-600">Categories</div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center mr-3">
+                      <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-2xl font-bold text-gray-900">50+</div>
+                      <div class="text-sm text-gray-600">Countries</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -627,6 +775,36 @@ document.addEventListener('DOMContentLoaded', function() {
     pill.addEventListener('click', function(e) {
       e.preventDefault();
       const targetId = this.getAttribute('href').substring(1);
+
+    // Category search functionality
+    const searchInput = document.getElementById('categorySearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const categoryItems = document.querySelectorAll('.category-nav-item');
+        
+        categoryItems.forEach(item => {
+          const categoryName = item.textContent.toLowerCase();
+          if (categoryName.includes(searchTerm)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    // Mobile categories toggle
+    const mobileCategoriesToggle = document.getElementById('mobileCategoriesToggle');
+    if (mobileCategoriesToggle) {
+      mobileCategoriesToggle.addEventListener('click', function() {
+        // Scroll to categories or show mobile menu
+        const firstCategory = document.querySelector('.category-section');
+        if (firstCategory) {
+          firstCategory.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
       const targetSection = document.getElementById(targetId);
       
       if (targetSection) {
@@ -644,14 +822,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
 /* Hide scrollbars for horizontal scroll */
 .products-scroll::-webkit-scrollbar,
-.lg\:hidden .overflow-x-auto::-webkit-scrollbar {
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Active category navigation state */
 .category-nav-item.active {
-  background-color: #0003ff !important;
-  border-color: #0003ff !important;
+  background: linear-gradient(135deg, #0003ff, #4f46e5) !important;
+}
+
+.category-nav-item.active .relative span {
   color: white !important;
 }
 
@@ -660,21 +845,22 @@ document.addEventListener('DOMContentLoaded', function() {
   color: #0003ff !important;
 }
 
-/* Category nav hover effects */
+/* Enhanced hover effects */
 .category-nav-item:hover {
-  background-color: #0003ff !important;
-  border-color: #0003ff !important;
-  color: white !important;
+  transform: translateX(4px);
+  box-shadow: 0 10px 25px rgba(0, 3, 255, 0.15);
 }
 
-.category-nav-item:hover span:last-child {
-  background-color: white !important;
-  color: #0003ff !important;
+/* Mobile bottom nav enhancements */
+.mobile-bottom-nav-item:hover {
+  background: linear-gradient(135deg, #0003ff, #4f46e5);
+  color: white;
+  border-color: #0003ff;
 }
 
-/* Mobile bottom nav scrollbar hide */
-.mobile-bottom-nav-item::-webkit-scrollbar {
-  display: none;
+.mobile-bottom-nav-item:hover span:last-child {
+  background-color: white;
+  color: #0003ff;
 }
 
 /* Smooth scroll behavior */
@@ -682,7 +868,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Image fade-in animation */
+/* Enhanced animations */
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -692,14 +878,16 @@ html {
   to { opacity: 1; }
 }
 
-/* Mobile categories panel animation */
-#mobileCategoriesPanel {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Gradient animations */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Premium gradient background */
-.bg-gradient-to-r {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
 }
 
 /* Performance optimizations */
@@ -709,6 +897,16 @@ html {
 
 .products-scroll {
   contain: layout style;
+}
+
+/* Enhanced scroll buttons */
+.scroll-btn {
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 3, 255, 0.1);
+}
+
+.scroll-btn:hover {
+  box-shadow: 0 15px 35px rgba(0, 3, 255, 0.2);
 }
 
 /* Accessibility improvements */
@@ -722,10 +920,6 @@ html {
   }
   
   .scroll-btn {
-    transition: none;
-  }
-  
-  #mobileCategoriesPanel {
     transition: none;
   }
 }
@@ -745,6 +939,37 @@ html {
 @media (max-width: 1023px) {
   .lg\:ml-80 {
     margin-left: 0 !important;
+  }
+  
+  /* Hide category images on mobile to prevent overflow */
+  .category-section .flex-shrink-0 {
+    display: none;
+  }
+  
+  /* Ensure full width on mobile */
+  .category-section .flex-1 {
+    width: 100%;
+  }
+}
+
+/* Premium scrollbar styling for desktop */
+@media (min-width: 1024px) {
+  .products-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .products-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 3, 255, 0.1);
+    border-radius: 3px;
+  }
+  
+  .products-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #0003ff, #4f46e5);
+    border-radius: 3px;
+  }
+  
+  .products-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #0002e6, #4338ca);
   }
 }
 </style>
