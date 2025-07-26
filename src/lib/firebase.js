@@ -4,12 +4,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBqJ8XzGqJ8XzGqJ8XzGqJ8XzGqJ8XzGqJ8",
+ apiKey: "AIzaSyADADzp8HDoX8dWs8OE2Iv_rWQT01yF8zQ",
   authDomain: "swisstradeventures-admin.firebaseapp.com",
   projectId: "swisstradeventures-admin",
-  storageBucket: "swisstradeventures-admin.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef123456789012345678"
+  storageBucket: "swisstradeventures-admin.firebasestorage.app",
+  messagingSenderId: "251484801619",
+  appId: "1:251484801619:web:2b5418b63c39f7271514a6",
+  measurementId: "G-M59VCMVXVN"
 };
 
 // Initialize Firebase
