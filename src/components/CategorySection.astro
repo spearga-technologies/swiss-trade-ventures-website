@@ -58,6 +58,10 @@ const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
         </svg>
         <span class="font-medium">{products.length} {products.length === 1 ? 'product' : 'products'} available</span>
+        <span class="mx-2">•</span>
+        <a href="#" class="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
+          View Category
+        </a>
       </div>
     </div>
   </div>

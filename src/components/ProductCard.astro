@@ -19,9 +19,9 @@ export interface Props {
 const { product } = Astro.props;
 ---
 
-<article class="product-card flex-shrink-0 w-80 bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-blue-300 transition-all duration-300 group">
+<article class="product-card flex-shrink-0 w-72 bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-blue-300 transition-all duration-300 group flex flex-col">
   <!-- Product Image -->
-  <div class="aspect-square overflow-hidden bg-gray-50">
+  <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50 flex-shrink-0">
     <img 
       src={product.image}
       alt={product.name}
@@ -31,19 +31,19 @@ const { product } = Astro.props;
   </div>
   
   <!-- Product Info -->
-  <div class="p-6 space-y-4">
+  <div class="p-6 flex flex-col flex-grow">
     <!-- Product Name -->
-    <h3 class="text-lg font-bold text-gray-900 leading-tight line-clamp-2" style="font-family: 'Space Grotesk', sans-serif;">
+    <h3 class="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
       {product.name}
     </h3>
     
     <!-- Product Description -->
-    <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
+    <p class="text-sm text-gray-600 leading-relaxed line-clamp-2 mb-4 flex-grow">
       {product.description}
     </p>
     
-    <!-- Serial Number & Variations -->
-    <div class="flex items-center justify-between">
+    <!-- Serial Number & Variations - Fixed position -->
+    <div class="flex items-center justify-between mb-4">
       <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
         Serial: {product.serialNumber}
       </span>
@@ -54,10 +54,10 @@ const { product } = Astro.props;
       )}
     </div>
     
-    <!-- View Button -->
+    <!-- View Button - Always at bottom -->
     <a 
       href={`/products/${product.id}`}
-      class="inline-flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 group-hover:bg-blue-700"
+      class="inline-flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 group-hover:bg-blue-700 mt-auto"
       style="font-family: 'Space Grotesk', sans-serif;"
     >
       View Specifications
@@ -77,12 +77,6 @@ const { product } = Astro.props;
   overflow: hidden;
 }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 
 /* Premium hover effects */
 .product-card:hover {
