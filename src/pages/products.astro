@@ -323,8 +323,8 @@ const totalProducts = dummyProducts.length;
       </aside>
 
       <!-- Right Content Area (75% width) -->
-      <main class="ml-1/4 w-3/4 min-h-screen">
-        <div class="pl-20 pr-8 py-8 pt-40">
+      <main class="w-full min-h-screen">
+        <div class="ml-1/4 pl-8 pr-8 py-8 pt-40">
           
           <!-- Page Header -->
           <div class="mb-20">
@@ -528,11 +528,12 @@ html {
   }
   
   main {
-    margin-left: 0;
+    margin-left: 0 !important;
     width: 100%;
   }
   
-  main > div {
+  main .ml-1/4 {
+    margin-left: 0 !important;
     padding-left: 2rem !important;
   }
 }
