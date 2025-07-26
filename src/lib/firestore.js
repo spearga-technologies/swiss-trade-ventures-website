@@ -7,14 +7,14 @@ import {
   orderBy,
   addDoc,
   serverTimestamp,
-  limit
+  limit,
+  where
 } from "firebase/firestore";
 import { db } from "./firebase.js";
 
-// Enhanced error handling wrapper with longer timeout for real data
-const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 15000) => {
+// Enhanced error handling wrapper for dynamic loading
+const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 10000) => {
   return new Promise(async (resolve) => {
-    // Set up timeout
     const timeoutId = setTimeout(() => {
       console.warn("Firestore operation timed out after", timeoutMs, "ms, using fallback data");
       resolve(fallbackData);
@@ -30,7 +30,6 @@ const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 15000
       clearTimeout(timeoutId);
       console.error("Firestore operation error:", error.message);
       console.error("Error code:", error.code);
-      console.error("Full error:", error);
       
       // Return fallback data on any error
       console.warn("Using fallback data due to error");
@@ -42,7 +41,7 @@ const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 15000
 // Categories Collection Functions
 export const categoriesCollection = collection(db, "categories");
 
-// Get all categories with enhanced fallback
+// Get all categories - Dynamic loading
 export const getAllCategories = async () => {
   const fallbackCategories = [
     {
@@ -54,18 +53,18 @@ export const getAllCategories = async () => {
   ];
 
   return withErrorHandling(async () => {
-    console.log("Fetching categories from Firestore...");
+    console.log("🔥 Fetching categories from Firestore...");
     const querySnapshot = await getDocs(query(categoriesCollection, orderBy("name"), limit(50)));
     const categories = [];
     
     if (querySnapshot.empty) {
-      console.log("No categories found in Firestore");
+      console.log("❌ No categories found in Firestore");
       return fallbackCategories;
     }
     
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      console.log("Category data:", { id: doc.id, ...data });
+      console.log("📂 Category data:", { id: doc.id, ...data });
       categories.push({ 
         id: doc.id, 
         name: data.name || 'Unnamed Category',
@@ -74,12 +73,12 @@ export const getAllCategories = async () => {
       });
     });
     
-    console.log(`Successfully fetched ${categories.length} categories from Firestore`);
+    console.log(`✅ Successfully fetched ${categories.length} categories from Firestore`);
     return categories.length > 0 ? categories : fallbackCategories;
-  }, fallbackCategories, 15000);
+  }, fallbackCategories, 10000);
 };
 
-// Get category by ID with enhanced fallback
+// Get category by ID - Dynamic loading
 export const getCategoryById = async (categoryId) => {
   const fallbackCategory = {
     id: categoryId,
@@ -89,13 +88,13 @@ export const getCategoryById = async (categoryId) => {
   };
 
   return withErrorHandling(async () => {
-    console.log("Fetching category by ID:", categoryId);
+    console.log("🔥 Fetching category by ID:", categoryId);
     const docRef = doc(db, "categories", categoryId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       const data = docSnap.data();
-      console.log("Category found:", { id: docSnap.id, ...data });
+      console.log("📂 Category found:", { id: docSnap.id, ...data });
       return { 
         id: docSnap.id, 
         name: data.name || fallbackCategory.name,
@@ -103,16 +102,16 @@ export const getCategoryById = async (categoryId) => {
         image: data.image || fallbackCategory.image
       };
     } else {
-      console.log("Category not found, using fallback");
+      console.log("❌ Category not found, using fallback");
       return fallbackCategory;
     }
-  }, fallbackCategory, 10000);
+  }, fallbackCategory, 8000);
 };
 
 // Products Collection Functions
 export const productsCollection = collection(db, "products");
 
-// Get all products with enhanced fallback
+// Get all products - Dynamic loading
 export const getAllProducts = async () => {
   const fallbackProducts = [
     {
@@ -137,18 +136,18 @@ export const getAllProducts = async () => {
   ];
 
   return withErrorHandling(async () => {
-    console.log("Fetching products from Firestore...");
+    console.log("🔥 Fetching products from Firestore...");
     const querySnapshot = await getDocs(query(productsCollection, orderBy("name"), limit(100)));
     const products = [];
     
     if (querySnapshot.empty) {
-      console.log("No products found in Firestore");
+      console.log("❌ No products found in Firestore");
       return fallbackProducts;
     }
     
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      console.log("Product data:", { id: doc.id, ...data });
+      console.log("📦 Product data:", { id: doc.id, ...data });
       
       // Handle categoryRef properly
       let categoryId = data.category || 'uncategorized';
@@ -168,12 +167,12 @@ export const getAllProducts = async () => {
       });
     });
     
-    console.log(`Successfully fetched ${products.length} products from Firestore`);
+    console.log(`✅ Successfully fetched ${products.length} products from Firestore`);
     return products.length > 0 ? products : fallbackProducts;
-  }, fallbackProducts, 15000);
+  }, fallbackProducts, 12000);
 };
 
-// Get single product by ID with enhanced fallback
+// Get single product by ID - Dynamic loading
 export const getProductById = async (productId) => {
   const fallbackProduct = {
     id: productId,
@@ -186,13 +185,13 @@ export const getProductById = async (productId) => {
   };
 
   return withErrorHandling(async () => {
-    console.log("Fetching product by ID:", productId);
+    console.log("🔥 Fetching product by ID:", productId);
     const docRef = doc(db, "products", productId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       const data = docSnap.data();
-      console.log("Product found:", { id: docSnap.id, ...data });
+      console.log("📦 Product found:", { id: docSnap.id, ...data });
       
       // Handle categoryRef properly
       let categoryId = data.category || fallbackProduct.category;
@@ -210,13 +209,49 @@ export const getProductById = async (productId) => {
         variations: data.variations || []
       };
     } else {
-      console.log("Product not found, using fallback");
+      console.log("❌ Product not found, using fallback");
       return fallbackProduct;
     }
-  }, fallbackProduct, 10000);
+  }, fallbackProduct, 8000);
 };
 
-// Group products by category for static generation with enhanced error handling
+// Get products by category - Dynamic loading
+export const getProductsByCategory = async (categoryId) => {
+  return withErrorHandling(async () => {
+    console.log("🔥 Fetching products for category:", categoryId);
+    
+    // Query products by categoryRef path
+    const categoryPath = `categories/${categoryId}`;
+    const q = query(
+      productsCollection, 
+      where("categoryRef", "==", doc(db, categoryPath)),
+      limit(50)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const products = [];
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      console.log("📦 Category product:", { id: doc.id, ...data });
+      
+      products.push({
+        id: doc.id,
+        name: data.name || 'Unnamed Product',
+        description: data.description || 'No description available',
+        serialNumber: data.serialNumber || 'N/A',
+        image: data.image || '',
+        category: categoryId,
+        variations: data.variations || []
+      });
+    });
+    
+    console.log(`✅ Found ${products.length} products for category ${categoryId}`);
+    return products;
+  }, [], 10000);
+};
+
+// Group products by category for dynamic loading
 export const groupProductsByCategory = async () => {
   const fallbackData = {
     categories: [
@@ -258,18 +293,15 @@ export const groupProductsByCategory = async () => {
   };
 
   return withErrorHandling(async () => {
-    console.log("Fetching categories and products for grouping...");
+    console.log("🔥 Dynamically fetching categories and products for grouping...");
     
-    // Fetch both collections with longer timeout
-    const [categoriesResult, productsResult] = await Promise.allSettled([
+    // Fetch both collections concurrently
+    const [categories, products] = await Promise.all([
       getAllCategories(),
       getAllProducts()
     ]);
     
-    const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : fallbackData.categories;
-    const products = productsResult.status === 'fulfilled' ? productsResult.value : fallbackData.categorizedProducts["demo-category"].products;
-    
-    console.log(`Processing ${categories.length} categories and ${products.length} products`);
+    console.log(`📊 Processing ${categories.length} categories and ${products.length} products`);
     
     const categorizedProducts = {};
     
@@ -290,13 +322,13 @@ export const groupProductsByCategory = async () => {
         categoryId = product.categoryRef.path.split('/').pop();
       }
       
-      console.log(`Assigning product ${product.name} to category ${categoryId}`);
+      console.log(`📦 Assigning product ${product.name} to category ${categoryId}`);
       
       if (categorizedProducts[categoryId]) {
         categorizedProducts[categoryId].products.push(product);
       } else {
         // Create category if it doesn't exist
-        console.log(`Creating new category: ${categoryId}`);
+        console.log(`📂 Creating new category: ${categoryId}`);
         categorizedProducts[categoryId] = {
           category: {
             id: categoryId,
@@ -309,24 +341,55 @@ export const groupProductsByCategory = async () => {
       }
     });
     
-    console.log("Successfully grouped products by category");
+    console.log("✅ Successfully grouped products by category dynamically");
     return { categories, categorizedProducts };
-  }, fallbackData, 20000); // Longer timeout for this complex operation
+  }, fallbackData, 15000);
 };
 
 // Leads Collection Functions
 export const leadsCollection = collection(db, "leads");
 
-// Add lead submission with enhanced error handling
+// Add lead submission
 export const addLead = async (leadData) => {
   return withErrorHandling(async () => {
-    console.log("Adding lead to Firestore:", leadData);
+    console.log("🔥 Adding lead to Firestore:", leadData);
     const docRef = await addDoc(leadsCollection, {
       ...leadData,
       submittedAt: serverTimestamp(),
       status: 'new'
     });
-    console.log("Lead added successfully with ID:", docRef.id);
+    console.log("✅ Lead added successfully with ID:", docRef.id);
     return docRef.id;
-  }, null, 10000);
+  }, null, 8000);
+};
+
+// Client-side data fetching utilities
+export const fetchCategoriesClient = async () => {
+  try {
+    console.log("🌐 Client-side: Fetching categories...");
+    return await getAllCategories();
+  } catch (error) {
+    console.error("❌ Client-side category fetch error:", error);
+    return [];
+  }
+};
+
+export const fetchProductsClient = async () => {
+  try {
+    console.log("🌐 Client-side: Fetching products...");
+    return await getAllProducts();
+  } catch (error) {
+    console.error("❌ Client-side product fetch error:", error);
+    return [];
+  }
+};
+
+export const fetchGroupedDataClient = async () => {
+  try {
+    console.log("🌐 Client-side: Fetching grouped data...");
+    return await groupProductsByCategory();
+  } catch (error) {
+    console.error("❌ Client-side grouped data fetch error:", error);
+    return { categories: [], categorizedProducts: {} };
+  }
 };

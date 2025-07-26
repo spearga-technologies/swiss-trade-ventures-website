@@ -2,327 +2,550 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
-import ProductCard from '../../components/ProductCard.astro';
 import ContactModal from '../../components/ContactModal.astro';
-import { getAllProducts, getAllCategories, getProductById, getCategoryById } from '../../lib/firestore.js';
 
-// Generate static paths for all products
-export async function getStaticPaths() {
-  try {
-    console.log("Generating static paths for product pages...");
-    
-    // Direct calls with built-in error handling
-    const [products, categories] = await Promise.all([
-      getAllProducts(),
-      getAllCategories()
-    ]);
-    
-    console.log(`Generating paths for ${products.length} products`);
-    console.log("Product IDs:", products.map(p => p.id));
-    
-    // Create a map of categories for easy lookup
-    const categoryMap = {};
-    categories.forEach(cat => {
-      categoryMap[cat.id] = cat;
-    });
-    
-    return products.map((product) => {
-      // Get category ID from categoryRef
-      const categoryId = product.categoryRef?.path?.split('/').pop() || product.category;
-      const category = categoryMap[categoryId];
-      
-      console.log(`Product ${product.id} -> Category ${categoryId}`);
-      
-      // Get related products from same category
-      const relatedProducts = products
-        .filter(p => {
-          const pCategoryId = p.categoryRef?.path?.split('/').pop() || p.category;
-          return pCategoryId === categoryId && p.id !== product.id;
-        })
-        .slice(0, 3); // Limit to 3 related products
-      
-      return {
-        params: { id: product.id },
-        props: { 
-          product,
-          category: category || { id: categoryId, name: 'Unknown Category', description: '', image: '' },
-          relatedProducts
-        }
-      };
-    });
-  } catch (error) {
-    console.error('Error generating static paths:', error);
-    // Always return at least one path to prevent build failure
-    return [
-      {
-        params: { id: 'demo-product' },
-        props: {
-          product: {
-            id: 'demo-product',
-            name: 'Demo Product',
-            description: 'Demo product description',
-            serialNumber: 'DEMO001',
-            image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800',
-            variations: []
-          },
-          category: {
-            id: 'demo-category',
-            name: 'Demo Category',
-            description: 'Demo category',
-            image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800'
-          },
-          relatedProducts: []
-        }
-      }
-    ];
-  }
-}
-
-const { product, category, relatedProducts } = Astro.props;
-
-// Generate structured data for SEO
-const structuredData = {
-  "@context": "https://schema.org/",
-  "@type": "Product",
-  "name": product.name,
-  "description": product.description,
-  "image": product.image,
-  "sku": product.serialNumber,
-  "category": category.name,
-  "manufacturer": {
-    "@type": "Organization",
-    "name": "Swiss Trade Ventures"
-  }
-};
+// For dynamic loading, we'll handle the product fetching client-side
+// This page will be a dynamic route that loads data on the client
 ---
 
 <Layout 
-  title={`${product.name} - Medical Equipment | Swiss Trade Ventures`}
-  description={`${product.description} - Professional medical equipment with serial number ${product.serialNumber}. View detailed specifications and training applications.`}
+  title="Product Details - Medical Equipment | Swiss Trade Ventures"
+  description="View detailed specifications and information about our premium medical equipment products."
 >
-  <!-- Structured Data for SEO -->
-  <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
-  
   <Navbar />
   
   <!-- Main Product Detail Content -->
   <div class="min-h-screen bg-white pt-48 lg:pt-40 pb-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <!-- Breadcrumb Navigation -->
-      <nav class="mb-8" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-3 text-sm">
-          <li>
-            <a href="/" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
-              Home
-            </a>
-          </li>
-          <li class="flex items-center">
-            <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <a href="/products" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
-              Products
-            </a>
-          </li>
-          <li class="flex items-center">
-            <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="text-gray-500">{category.name}</span>
-          </li>
-          <li class="flex items-center">
-            <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-            <span class="text-gray-900 font-semibold">{product.name}</span>
-          </li>
-        </ol>
-      </nav>
-
-      <!-- Back to Products Link -->
-      <div class="mb-8">
-        <a 
-          href="/products" 
-          class="inline-flex items-center text-sm font-medium transition-colors duration-200"
-          style="color: #0003ff; hover:color: #0002e6;"
-        >
-          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      <!-- Loading State -->
+      <div id="loadingState" class="text-center py-16">
+        <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Back to Products
-        </a>
-      </div>
-
-      <!-- Product Details Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-        
-        <!-- Product Image -->
-        <div class="space-y-6">
-          <div class="aspect-square overflow-hidden rounded-2xl bg-gray-100">
-            <img 
-              src={product.image}
-              alt={product.name}
-              class="w-full h-full object-cover"
-              loading="eager"
-            />
-          </div>
-          
-          <!-- Category Info Card -->
-          <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-            <img 
-              src={category.image}
-              alt={category.name}
-              class="w-12 h-12 object-cover rounded-lg"
-            />
-            <div>
-              <p class="text-sm font-medium text-gray-900">Category</p>
-              <p class="text-sm text-gray-600">{category.name}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Product Information -->
-        <div class="space-y-8">
-          
-          <!-- Product Header -->
-          <div>
-            <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
-              {product.name}
-            </h1>
-            
-            <div class="flex items-center space-x-4 mb-6">
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                Serial: {product.serialNumber}
-              </span>
-              {product.variations && product.variations.length > 0 && (
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {product.variations.length} {product.variations.length === 1 ? 'Variation' : 'Variations'}
-                </span>
-              )}
-            </div>
-            
-            <p class="text-lg text-gray-600 leading-relaxed">
-              {product.description}
-            </p>
-          </div>
-
-          <!-- Product Variations -->
-          {product.variations && product.variations.length > 0 && (
-            <div class="space-y-6">
-              <h2 class="text-xl font-bold mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
-                Product Variations
-              </h2>
-              
-              <div class="space-y-4">
-                {product.variations.map((variation, index) => (
-                  <div class="rounded-xl p-6 bg-gray-50" style="border: 1px solid #0003ff;">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
-                      {variation.name}
-                    </h3>
-                    
-                    {variation.attributes && variation.attributes.length > 0 && (
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {variation.attributes.map((attribute, attrIndex) => (
-                          <div class="flex justify-between items-center py-3 px-4 bg-white rounded-lg">
-                            <span class="text-sm font-medium text-gray-600">
-                              {attribute.title}
-                            </span>
-                            <span class="text-sm text-gray-900 font-semibold">
-                              {attribute.value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <!-- Action Buttons -->
-          <div class="space-y-4">
-            <button 
-              class="w-full text-white px-8 py-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
-              style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff;"
-              onclick="openContactModal()"
-            >
-              Request Information
-            </button>
-            
-            <a 
-              href="/request-catalogue"
-              class="w-full inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
-              style="border: 1px solid #0003ff; hover:background-color: #f8f9ff; focus:ring-color: #0003ff;"
-            >
-              Download Catalogue
-            </a>
-          </div>
-
-          <!-- Additional Information -->
-          <div class="bg-blue-50 rounded-xl p-6">
-            <h3 class="text-lg font-semibold text-blue-900 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
-              Training Applications
-            </h3>
-            <p class="text-blue-800 text-sm leading-relaxed">
-              This medical equipment is designed for professional healthcare training environments. 
-              Perfect for medical schools, nursing programs, and continuing education facilities. 
-              Meets international quality standards for educational use.
-            </p>
-          </div>
+          <span class="text-blue-600 font-medium">Loading product details...</span>
         </div>
       </div>
 
-      <!-- Related Products Section -->
-      <div class="border-t border-gray-200 pt-16">
-        <div class="mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
-            More from {category.name}
-          </h2>
-          <p class="text-lg text-gray-600">
-            Explore other products in this category
-          </p>
-        </div>
+      <!-- Product Content Container -->
+      <div id="productContent" class="hidden">
+        <!-- Content will be loaded dynamically -->
+      </div>
 
-        <!-- Related Products Grid -->
-        {relatedProducts.length > 0 ? (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {relatedProducts.map((relatedProduct) => (
-            <ProductCard product={relatedProduct} />
-          ))}
-        </div>
-        ) : (
-          <div class="text-center py-12 text-gray-500">
-            <p class="text-lg">No other products available in this category yet.</p>
-          </div>
-        )}
-
-        <!-- View All Category Products -->
-        <div class="text-center mt-12">
-          <a 
-            href={`/products#${category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
-            class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
-            style="background-color: #0003ff; hover:background-color: #0002e6;"
-          >
-            View All {category.name}
-            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
+      <!-- Error State -->
+      <div id="errorState" class="text-center py-16 hidden">
+        <div class="max-w-md mx-auto">
+          <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Product not found</h3>
+          <p class="text-gray-600 mb-4">The product you're looking for doesn't exist or couldn't be loaded.</p>
+          <a href="/products" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Back to Products
           </a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Include Contact Modal Component -->
-  <ContactModal product={product} />
+  <!-- Contact Modal will be added dynamically -->
+  <div id="contactModalContainer"></div>
 
   <Footer />
 </Layout>
 
-<!-- Add data attributes for the modal to access product info -->
-<div style="display: none;">
-  <span data-product-name>{product.name}</span>
-  <span data-product-serial>{product.serialNumber}</span>
-</div>
+<!-- Dynamic Loading Script -->
+<script>
+import { getProductById, getCategoryById, getProductsByCategory } from '../../lib/firestore.js';
+
+// Get product ID from URL
+const productId = window.location.pathname.split('/').pop();
+let currentProduct = null;
+let currentCategory = null;
+let relatedProducts = [];
+
+// Initialize dynamic loading
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log('🚀 Loading product:', productId);
+  
+  try {
+    // Show loading state
+    showLoadingState();
+    
+    // Fetch product data
+    currentProduct = await getProductById(productId);
+    console.log('📦 Loaded product:', currentProduct);
+    
+    // Fetch category data
+    if (currentProduct.category) {
+      currentCategory = await getCategoryById(currentProduct.category);
+      console.log('📂 Loaded category:', currentCategory);
+      
+      // Fetch related products
+      relatedProducts = await getProductsByCategory(currentProduct.category);
+      relatedProducts = relatedProducts.filter(p => p.id !== productId).slice(0, 3);
+      console.log('🔗 Loaded related products:', relatedProducts.length);
+    }
+    
+    // Render the product page
+    renderProductPage();
+    
+    // Hide loading, show content
+    hideLoadingState();
+    showProductContent();
+    
+    // Update page title and meta
+    updatePageMeta();
+    
+  } catch (error) {
+    console.error('❌ Error loading product:', error);
+    showErrorState();
+  }
+});
+
+function showLoadingState() {
+  document.getElementById('loadingState').classList.remove('hidden');
+  document.getElementById('productContent').classList.add('hidden');
+  document.getElementById('errorState').classList.add('hidden');
+}
+
+function hideLoadingState() {
+  document.getElementById('loadingState').classList.add('hidden');
+}
+
+function showProductContent() {
+  document.getElementById('productContent').classList.remove('hidden');
+}
+
+function showErrorState() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('productContent').classList.add('hidden');
+  document.getElementById('errorState').classList.remove('hidden');
+}
+
+function updatePageMeta() {
+  if (currentProduct) {
+    document.title = `${currentProduct.name} - Medical Equipment | Swiss Trade Ventures`;
+    
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.content = `${currentProduct.description} - Professional medical equipment with serial number ${currentProduct.serialNumber}. View detailed specifications and training applications.`;
+    }
+  }
+}
+
+function renderProductPage() {
+  const productContent = document.getElementById('productContent');
+  
+  productContent.innerHTML = `
+    <!-- Breadcrumb Navigation -->
+    <nav class="mb-8" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-3 text-sm">
+        <li>
+          <a href="/" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+            Home
+          </a>
+        </li>
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <a href="/products" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+            Products
+          </a>
+        </li>
+        ${currentCategory ? `
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <span class="text-gray-500">${currentCategory.name}</span>
+        </li>
+        ` : ''}
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <span class="text-gray-900 font-semibold">${currentProduct.name}</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Back to Products Link -->
+    <div class="mb-8">
+      <a 
+        href="/products" 
+        class="inline-flex items-center text-sm font-medium transition-colors duration-200"
+        style="color: #0003ff; hover:color: #0002e6;"
+      >
+        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Products
+      </a>
+    </div>
+
+    <!-- Product Details Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+      
+      <!-- Product Image -->
+      <div class="space-y-6">
+        <div class="aspect-square overflow-hidden rounded-2xl bg-gray-100">
+          <img 
+            src="${currentProduct.image}"
+            alt="${currentProduct.name}"
+            class="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+        
+        ${currentCategory ? `
+        <!-- Category Info Card -->
+        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+          <img 
+            src="${currentCategory.image}"
+            alt="${currentCategory.name}"
+            class="w-12 h-12 object-cover rounded-lg"
+          />
+          <div>
+            <p class="text-sm font-medium text-gray-900">Category</p>
+            <p class="text-sm text-gray-600">${currentCategory.name}</p>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Product Information -->
+      <div class="space-y-8">
+        
+        <!-- Product Header -->
+        <div>
+          <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+            ${currentProduct.name}
+          </h1>
+          
+          <div class="flex items-center space-x-4 mb-6">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+              Serial: ${currentProduct.serialNumber}
+            </span>
+            ${currentProduct.variations && currentProduct.variations.length > 0 ? `
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              ${currentProduct.variations.length} ${currentProduct.variations.length === 1 ? 'Variation' : 'Variations'}
+            </span>
+            ` : ''}
+          </div>
+          
+          <p class="text-lg text-gray-600 leading-relaxed">
+            ${currentProduct.description}
+          </p>
+        </div>
+
+        ${renderProductVariations()}
+
+        <!-- Action Buttons -->
+        <div class="space-y-4">
+          <button 
+            class="w-full text-white px-8 py-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+            style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff;"
+            onclick="openContactModal()"
+          >
+            Request Information
+          </button>
+          
+          <a 
+            href="/request-catalogue"
+            class="w-full inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+            style="border: 1px solid #0003ff; hover:background-color: #f8f9ff; focus:ring-color: #0003ff;"
+          >
+            Download Catalogue
+          </a>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="bg-blue-50 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-blue-900 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
+            Training Applications
+          </h3>
+          <p class="text-blue-800 text-sm leading-relaxed">
+            This medical equipment is designed for professional healthcare training environments. 
+            Perfect for medical schools, nursing programs, and continuing education facilities. 
+            Meets international quality standards for educational use.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    ${renderRelatedProducts()}
+  `;
+  
+  // Add contact modal
+  renderContactModal();
+  
+  // Add data attributes for modal
+  addProductDataAttributes();
+}
+
+function renderProductVariations() {
+  if (!currentProduct.variations || currentProduct.variations.length === 0) {
+    return '';
+  }
+  
+  const variationsHtml = currentProduct.variations.map((variation, index) => `
+    <div class="rounded-xl p-6 bg-gray-50" style="border: 1px solid #0003ff;">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+        ${variation.name}
+      </h3>
+      
+      ${variation.attributes && variation.attributes.length > 0 ? `
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        ${variation.attributes.map(attribute => `
+        <div class="flex justify-between items-center py-3 px-4 bg-white rounded-lg">
+          <span class="text-sm font-medium text-gray-600">
+            ${attribute.title}
+          </span>
+          <span class="text-sm text-gray-900 font-semibold">
+            ${attribute.value}
+          </span>
+        </div>
+        `).join('')}
+      </div>
+      ` : ''}
+    </div>
+  `).join('');
+  
+  return `
+    <!-- Product Variations -->
+    <div class="space-y-6">
+      <h2 class="text-xl font-bold mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+        Product Variations
+      </h2>
+      
+      <div class="space-y-4">
+        ${variationsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderRelatedProducts() {
+  if (!relatedProducts || relatedProducts.length === 0) {
+    return `
+      <!-- Related Products Section -->
+      <div class="border-t border-gray-200 pt-16">
+        <div class="mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+            More from ${currentCategory ? currentCategory.name : 'this category'}
+          </h2>
+          <p class="text-lg text-gray-600">
+            Explore other products in this category
+          </p>
+        </div>
+        
+        <div class="text-center py-12 text-gray-500">
+          <p class="text-lg">No other products available in this category yet.</p>
+        </div>
+      </div>
+    `;
+  }
+  
+  const relatedProductsHtml = relatedProducts.map(product => `
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff;">
+      <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50">
+        <img 
+          src="${product.image}"
+          alt="${product.name}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
+      
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-gray-900 leading-tight mb-3" style="font-family: 'Space Grotesk', sans-serif;">
+          ${product.name}
+        </h3>
+        
+        <p class="text-sm text-gray-600 leading-relaxed mb-4">
+          ${product.description}
+        </p>
+        
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Serial: ${product.serialNumber}
+          </span>
+        </div>
+        
+        <a 
+          href="/products/${product.id}"
+          class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl transition-all duration-200"
+          style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
+        >
+          View Specifications
+          <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <!-- Related Products Section -->
+    <div class="border-t border-gray-200 pt-16">
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+          More from ${currentCategory ? currentCategory.name : 'this category'}
+        </h2>
+        <p class="text-lg text-gray-600">
+          Explore other products in this category
+        </p>
+      </div>
+
+      <!-- Related Products Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${relatedProductsHtml}
+      </div>
+
+      <!-- View All Category Products -->
+      ${currentCategory ? `
+      <div class="text-center mt-12">
+        <a 
+          href="/products#${currentCategory.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}"
+          class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
+          style="background-color: #0003ff; hover:background-color: #0002e6;"
+        >
+          View All ${currentCategory.name}
+          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderContactModal() {
+  // This would normally be imported from the ContactModal component
+  // For now, we'll create a simplified version
+  const contactModalContainer = document.getElementById('contactModalContainer');
+  
+  contactModalContainer.innerHTML = `
+    <!-- Simplified Contact Modal -->
+    <div id="contactModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
+      <div class="bg-white rounded-3xl w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">Contact Us</h3>
+            <button onclick="closeContactModal()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-gray-600 mb-6">
+              Interested in ${currentProduct.name}? Contact us for more information.
+            </p>
+            
+            <div class="space-y-4">
+              <a href="mailto:info@swisstradeventures.com" class="block w-full py-3 px-6 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+                Send Email
+              </a>
+              <a href="tel:+41441234567" class="block w-full py-3 px-6 border border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors">
+                Call Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function addProductDataAttributes() {
+  // Add hidden data attributes for any scripts that might need them
+  const dataContainer = document.createElement('div');
+  dataContainer.style.display = 'none';
+  dataContainer.innerHTML = `
+    <span data-product-name>${currentProduct.name}</span>
+    <span data-product-serial>${currentProduct.serialNumber}</span>
+  `;
+  document.body.appendChild(dataContainer);
+}
+
+// Global functions for modal
+window.openContactModal = function() {
+  const modal = document.getElementById('contactModal');
+  const content = modal.querySelector('.modal-content');
+  
+  modal.classList.remove('hidden', 'opacity-0');
+  modal.classList.add('opacity-100');
+  modal.style.pointerEvents = 'auto';
+  document.body.style.overflow = 'hidden';
+  
+  setTimeout(() => {
+    content.style.transform = 'scale(1)';
+    content.style.opacity = '1';
+  }, 10);
+};
+
+window.closeContactModal = function() {
+  const modal = document.getElementById('contactModal');
+  const content = modal.querySelector('.modal-content');
+  
+  content.style.transform = 'scale(0.95)';
+  content.style.opacity = '0';
+  modal.classList.remove('opacity-100');
+  modal.classList.add('opacity-0');
+  modal.style.pointerEvents = 'none';
+  
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  }, 300);
+};
+</script>
+
+<!-- Enhanced Styles -->
+<style>
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Modal animations */
+.modal-content {
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button hover effects */
+button:hover, a:hover {
+  transform: translateY(-1px);
+}
+
+/* Product card hover effects */
+.group:hover {
+  transform: translateY(-2px);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>

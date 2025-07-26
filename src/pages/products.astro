@@ -3,61 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import CategorySection from '../components/CategorySection.astro';
-import { groupProductsByCategory } from '../lib/firestore.js';
-
-// Fetch real data from Firestore at build time with error handling
-let categories = [];
-let categorizedProducts = {};
-
-try {
-  console.log("Fetching data for products page...");
-  
-  // Direct call to groupProductsByCategory with better error handling
-  const data = await groupProductsByCategory();
-  
-  categories = data.categories;
-  categorizedProducts = data.categorizedProducts;
-  
-  console.log("Products page data loaded:");
-  console.log("Categories:", categories.length);
-  console.log("Category IDs:", categories.map(c => c.id));
-  console.log("Products by category:", Object.keys(categorizedProducts));
-  
-} catch (error) {
-  console.error("Error fetching data for products page:", error);
-  console.error("Using hardcoded fallback data");
-  
-  categories = [{
-    id: "demo-category",
-    name: "Demo Category",
-    description: "Demo category for testing",
-    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
-  }];
-  categorizedProducts = {
-    "demo-category": {
-      category: categories[0],
-      products: [{
-        id: "demo-product", 
-        name: "Demo Product",
-        description: "Demo product for testing purposes",
-        serialNumber: "DEMO001",
-        image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-        variations: []
-      }]
-    }
-  };
-}
-
-// Generate category anchors for navigation
-const categoryAnchors = categories.map(cat => ({
-  id: cat.id,
-  name: cat.name,
-  anchor: cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-  productCount: categorizedProducts[cat.id]?.products?.length || 0
-}));
-
-// Calculate total products
-const totalProducts = Object.values(categorizedProducts).reduce((total, cat) => total + cat.products.length, 0);
 ---
 
 <Layout 
@@ -84,22 +29,9 @@ const totalProducts = Object.values(categorizedProducts).reduce((total, cat) => 
           </div>
 
           <!-- Categories Navigation -->
-          <nav class="space-y-2" aria-label="Product categories">
-            {categoryAnchors.map((category) => (
-              <a 
-                href={`#${category.anchor}`}
-                class="category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent"
-                style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
-                data-category={category.anchor}
-              >
-                <span class="text-sm font-medium truncate pr-2">{category.name}</span>
-                <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-200">
-                  {category.productCount}
-                </span>
-              </a>
-            ))}
+          <nav id="categoriesNav" class="space-y-2" aria-label="Product categories">
+            <!-- Categories will be loaded dynamically -->
           </nav>
-
         </div>
       </aside>
 
@@ -107,17 +39,8 @@ const totalProducts = Object.values(categorizedProducts).reduce((total, cat) => 
       <!-- Mobile Bottom Navigation Bar -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
         <div class="px-4 py-3">
-          <div class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
-            {categoryAnchors.map((category) => (
-              <a 
-                href={`#${category.anchor}`}
-                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200"
-                style="border: 1px solid #0003ff;"
-                data-category={category.anchor}
-              >
-                {category.name}
-              </a>
-            ))}
+          <div id="mobileNav" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
+            <!-- Mobile nav will be loaded dynamically -->
           </div>
         </div>
       </div>
@@ -138,19 +61,8 @@ const totalProducts = Object.values(categorizedProducts).reduce((total, cat) => 
           </div>
           
           <!-- Mobile Categories Navigation -->
-          <nav class="space-y-2" aria-label="Product categories">
-            {categoryAnchors.map((category) => (
-              <a 
-                href={`#${category.anchor}`}
-                class="mobile-category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200"
-                data-category={category.anchor}
-              >
-                <span class="text-sm font-medium truncate pr-2">{category.name}</span>
-                <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors duration-200">
-                  {category.productCount}
-                </span>
-              </a>
-            ))}
+          <nav id="mobileCategoriesNav" class="space-y-2" aria-label="Product categories">
+            <!-- Mobile categories will be loaded dynamically -->
           </nav>
         </div>
       </div>
@@ -171,17 +83,34 @@ const totalProducts = Object.values(categorizedProducts).reduce((total, cat) => 
             </div>
           </div>
 
-          <!-- Quick Navigation Pills (Mobile) -->
-          <!-- Removed Quick Navigation Pills as we now have bottom nav -->
+          <!-- Loading State -->
+          <div id="loadingState" class="text-center py-16">
+            <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="text-blue-600 font-medium">Loading products from database...</span>
+            </div>
+          </div>
 
-          <!-- Categories and Products -->
-          <div class="space-y-12 lg:space-y-16">
-            {Object.entries(categorizedProducts).map(([categoryId, categoryData]) => (
-              <CategorySection 
-                category={categoryData.category} 
-                products={categoryData.products} 
-              />
-            ))}
+          <!-- Categories and Products Container -->
+          <div id="productsContainer" class="space-y-12 lg:space-y-16 hidden">
+            <!-- Categories will be loaded dynamically -->
+          </div>
+
+          <!-- Error State -->
+          <div id="errorState" class="text-center py-16 hidden">
+            <div class="max-w-md mx-auto">
+              <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Unable to load products</h3>
+              <p class="text-gray-600 mb-4">There was an issue connecting to the database. Please try refreshing the page.</p>
+              <button onclick="window.location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Refresh Page
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -191,35 +120,288 @@ const totalProducts = Object.values(categorizedProducts).reduce((total, cat) => 
   <Footer />
 </Layout>
 
-<!-- Enhanced JavaScript for Premium Interactions -->
+<!-- Dynamic Loading Script -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Mobile bottom navigation
-  const mobileBottomNavItems = document.querySelectorAll('.mobile-bottom-nav-item');
-  mobileBottomNavItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href').substring(1);
-      const targetSection = document.getElementById(targetId);
-      
-      if (targetSection) {
-        // Update active state for mobile nav
-        mobileBottomNavItems.forEach(nav => {
-          nav.style.backgroundColor = 'white';
-          nav.style.color = '#374151';
-        });
-        this.style.backgroundColor = '#0003ff';
-        this.style.color = 'white';
-        
-        targetSection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    });
-  });
+import { fetchGroupedDataClient } from '../lib/firestore.js';
 
-  // Smooth scrolling for category navigation
+// Global state
+let categoriesData = [];
+let categorizedProducts = {};
+
+// Initialize dynamic loading
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log('🚀 Starting dynamic product loading...');
+  
+  try {
+    // Show loading state
+    showLoadingState();
+    
+    // Fetch data dynamically
+    const data = await fetchGroupedDataClient();
+    categoriesData = data.categories;
+    categorizedProducts = data.categorizedProducts;
+    
+    console.log('📊 Loaded data:', { 
+      categories: categoriesData.length, 
+      products: Object.keys(categorizedProducts).length 
+    });
+    
+    // Render the UI
+    renderCategories();
+    renderProducts();
+    setupNavigation();
+    
+    // Hide loading, show content
+    hideLoadingState();
+    showProductsContainer();
+    
+  } catch (error) {
+    console.error('❌ Error loading products:', error);
+    showErrorState();
+  }
+});
+
+function showLoadingState() {
+  document.getElementById('loadingState').classList.remove('hidden');
+  document.getElementById('productsContainer').classList.add('hidden');
+  document.getElementById('errorState').classList.add('hidden');
+}
+
+function hideLoadingState() {
+  document.getElementById('loadingState').classList.add('hidden');
+}
+
+function showProductsContainer() {
+  document.getElementById('productsContainer').classList.remove('hidden');
+}
+
+function showErrorState() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('productsContainer').classList.add('hidden');
+  document.getElementById('errorState').classList.remove('hidden');
+}
+
+function renderCategories() {
+  const categoriesNav = document.getElementById('categoriesNav');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileCategoriesNav = document.getElementById('mobileCategoriesNav');
+  
+  // Clear existing content
+  categoriesNav.innerHTML = '';
+  mobileNav.innerHTML = '';
+  mobileCategoriesNav.innerHTML = '';
+  
+  categoriesData.forEach(category => {
+    const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const productCount = categorizedProducts[category.id]?.products?.length || 0;
+    
+    // Desktop navigation
+    const desktopNavItem = createCategoryNavItem(category, anchor, productCount, 'desktop');
+    categoriesNav.appendChild(desktopNavItem);
+    
+    // Mobile bottom navigation
+    const mobileNavItem = createMobileNavItem(category, anchor);
+    mobileNav.appendChild(mobileNavItem);
+    
+    // Mobile sidebar navigation
+    const mobileSidebarItem = createCategoryNavItem(category, anchor, productCount, 'mobile');
+    mobileCategoriesNav.appendChild(mobileSidebarItem);
+  });
+}
+
+function createCategoryNavItem(category, anchor, productCount, type) {
+  const a = document.createElement('a');
+  a.href = `#${anchor}`;
+  a.className = `category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent`;
+  a.style.cssText = 'hover:background-color: #0003ff; hover:border-color: #0003ff;';
+  a.setAttribute('data-category', anchor);
+  
+  a.innerHTML = `
+    <span class="text-sm font-medium truncate pr-2">${category.name}</span>
+    <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-200">
+      ${productCount}
+    </span>
+  `;
+  
+  return a;
+}
+
+function createMobileNavItem(category, anchor) {
+  const a = document.createElement('a');
+  a.href = `#${anchor}`;
+  a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200';
+  a.style.cssText = 'border: 1px solid #0003ff;';
+  a.setAttribute('data-category', anchor);
+  a.textContent = category.name;
+  
+  return a;
+}
+
+function renderProducts() {
+  const productsContainer = document.getElementById('productsContainer');
+  productsContainer.innerHTML = '';
+  
+  Object.entries(categorizedProducts).forEach(([categoryId, categoryData]) => {
+    const categorySection = createCategorySection(categoryData.category, categoryData.products);
+    productsContainer.appendChild(categorySection);
+  });
+}
+
+function createCategorySection(category, products) {
+  const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  
+  const section = document.createElement('section');
+  section.id = anchor;
+  section.className = 'category-section mb-20 scroll-mt-40';
+  section.setAttribute('data-category', anchor);
+  
+  section.innerHTML = `
+    <!-- Category Header -->
+    <div class="flex items-start gap-8 mb-12 p-8 bg-gray-50 rounded-3xl">
+      <!-- Category Image (Hidden on Mobile) -->
+      <div class="flex-shrink-0 hidden md:block">
+        <img 
+          src="${category.image}"
+          alt="${category.name}"
+          class="w-40 h-40 object-cover rounded-2xl"
+          loading="lazy"
+        />
+      </div>
+      
+      <!-- Category Info -->
+      <div class="flex-1 space-y-4">
+        <h2 class="text-3xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+          ${category.name}
+        </h2>
+        <p class="text-lg text-gray-600 leading-relaxed">
+          ${category.description}
+        </p>
+        <div class="flex items-center text-sm text-gray-500">
+          <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+          <span class="font-medium">${products.length} ${products.length === 1 ? 'product' : 'products'} available</span>
+          <span class="mx-2">•</span>
+          <a href="#" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
+            View Category
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Container -->
+    <div class="relative">
+      ${products.length > 0 ? createProductsGrid(products, category.id) : createEmptyState()}
+    </div>
+  `;
+  
+  return section;
+}
+
+function createProductsGrid(products, categoryId) {
+  const productsHtml = products.map(product => createProductCard(product)).join('');
+  
+  return `
+    <!-- Scroll Indicators -->
+    <button 
+      class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0"
+      style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+      data-target="products-${categoryId}"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    </button>
+    
+    <button 
+      class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200"
+      style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+      data-target="products-${categoryId}"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </button>
+
+    <!-- Products Container -->
+    <div 
+      id="products-${categoryId}"
+      class="products-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
+      style="scrollbar-width: none; -ms-overflow-style: none;"
+    >
+      ${productsHtml}
+    </div>
+  `;
+}
+
+function createProductCard(product) {
+  const variationsText = product.variations && product.variations.length > 0 
+    ? `<span class="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+         ${product.variations.length} ${product.variations.length === 1 ? 'Variation' : 'Variations'}
+       </span>`
+    : '';
+
+  return `
+    <article class="product-card flex-shrink-0 w-72 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group flex flex-col" style="hover:border-color: #0003ff;">
+      <!-- Product Image -->
+      <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50 flex-shrink-0">
+        <img 
+          src="${product.image}"
+          alt="${product.name}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
+      
+      <!-- Product Info -->
+      <div class="p-6 flex flex-col flex-grow">
+        <!-- Product Name -->
+        <h3 class="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
+          ${product.name}
+        </h3>
+        
+        <!-- Product Description -->
+        <p class="text-sm text-gray-600 leading-relaxed line-clamp-2 mb-4 flex-grow">
+          ${product.description}
+        </p>
+        
+        <!-- Serial Number & Variations -->
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Serial: ${product.serialNumber}
+          </span>
+          ${variationsText}
+        </div>
+        
+        <!-- View Button -->
+        <a 
+          href="/products/${product.id}"
+          class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 mt-auto"
+          style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff; font-family: 'Space Grotesk', sans-serif;"
+        >
+          View Specifications
+          <svg class="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </article>
+  `;
+}
+
+function createEmptyState() {
+  return `
+    <div class="text-center py-16 text-gray-500">
+      <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"></path>
+      </svg>
+      <p class="text-lg">No products available in this category yet.</p>
+    </div>
+  `;
+}
+
+function setupNavigation() {
+  // Setup category navigation
   const categoryNavItems = document.querySelectorAll('.category-nav-item');
   const categorySection = document.querySelectorAll('.category-section');
   
@@ -247,7 +429,88 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Intersection Observer for active category highlighting
+  // Mobile bottom navigation
+  const mobileBottomNavItems = document.querySelectorAll('.mobile-bottom-nav-item');
+  mobileBottomNavItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetSection = document.getElementById(targetId);
+      
+      if (targetSection) {
+        // Update active state for mobile nav
+        mobileBottomNavItems.forEach(nav => {
+          nav.style.backgroundColor = 'white';
+          nav.style.color = '#374151';
+        });
+        this.style.backgroundColor = '#0003ff';
+        this.style.color = 'white';
+        
+        targetSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Setup scroll buttons
+  setupScrollButtons();
+  
+  // Setup intersection observer
+  setupIntersectionObserver();
+  
+  // Handle initial hash
+  handleInitialHash();
+}
+
+function setupScrollButtons() {
+  const scrollButtons = document.querySelectorAll('.scroll-btn');
+  
+  scrollButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const container = document.getElementById(targetId);
+      const scrollAmount = 320;
+      
+      if (this.classList.contains('scroll-left')) {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Update scroll button visibility
+  const productsContainers = document.querySelectorAll('.products-scroll');
+  
+  productsContainers.forEach(container => {
+    const categoryId = container.id.replace('products-', '');
+    const leftBtn = document.querySelector(`.scroll-left[data-target="products-${categoryId}"]`);
+    const rightBtn = document.querySelector(`.scroll-right[data-target="products-${categoryId}"]`);
+    
+    function updateScrollButtons() {
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      
+      if (scrollLeft > 0) {
+        leftBtn.style.opacity = '1';
+      } else {
+        leftBtn.style.opacity = '0';
+      }
+      
+      if (scrollLeft + clientWidth < scrollWidth - 10) {
+        rightBtn.style.opacity = '1';
+      } else {
+        rightBtn.style.opacity = '0';
+      }
+    }
+    
+    container.addEventListener('scroll', updateScrollButtons);
+    updateScrollButtons();
+  });
+}
+
+function setupIntersectionObserver() {
   const observerOptions = {
     root: null,
     rootMargin: '-20% 0px -70% 0px',
@@ -260,6 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryId = entry.target.getAttribute('data-category');
         
         // Update active navigation item
+        const categoryNavItems = document.querySelectorAll('.category-nav-item');
         categoryNavItems.forEach(nav => {
           nav.classList.remove('active');
           if (nav.getAttribute('data-category') === categoryId) {
@@ -271,58 +535,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }, observerOptions);
 
   // Observe all category sections
+  const categorySection = document.querySelectorAll('.category-section');
   categorySection.forEach(section => {
     observer.observe(section);
   });
+}
 
-  // Horizontal scroll functionality for products
-  const scrollButtons = document.querySelectorAll('.scroll-btn');
-  
-  scrollButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const targetId = this.getAttribute('data-target');
-      const container = document.getElementById(targetId);
-      const scrollAmount = 320; // Width of one product card + gap
-      
-      if (this.classList.contains('scroll-left')) {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    });
-  });
-
-  // Show/hide scroll buttons based on scroll position
-  const productsContainers = document.querySelectorAll('.products-scroll');
-  
-  productsContainers.forEach(container => {
-    const categoryId = container.id.replace('products-', '');
-    const leftBtn = document.querySelector(`.scroll-left[data-target="products-${categoryId}"]`);
-    const rightBtn = document.querySelector(`.scroll-right[data-target="products-${categoryId}"]`);
-    
-    function updateScrollButtons() {
-      const { scrollLeft, scrollWidth, clientWidth } = container;
-      
-      // Show/hide left button
-      if (scrollLeft > 0) {
-        leftBtn.style.opacity = '1';
-      } else {
-        leftBtn.style.opacity = '0';
-      }
-      
-      // Show/hide right button
-      if (scrollLeft + clientWidth < scrollWidth - 10) {
-        rightBtn.style.opacity = '1';
-      } else {
-        rightBtn.style.opacity = '0';
-      }
-    }
-    
-    container.addEventListener('scroll', updateScrollButtons);
-    updateScrollButtons(); // Initial check
-  });
-
-  // Handle initial hash in URL
+function handleInitialHash() {
   if (window.location.hash) {
     const targetId = window.location.hash.substring(1);
     const targetSection = document.getElementById(targetId);
@@ -332,44 +551,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 100);
     }
   }
-
-  // Image lazy loading optimization
-  const images = document.querySelectorAll('img[loading="lazy"]');
-  
-  if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.classList.add('fade-in');
-          imageObserver.unobserve(img);
-        }
-      });
-    });
-    
-    images.forEach(img => imageObserver.observe(img));
-  }
-
-  // Smooth scroll for quick navigation pills
-  const quickNavPills = document.querySelectorAll('.lg\\:hidden a[href^="#"]');
-  quickNavPills.forEach(pill => {
-    pill.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href').substring(1);
-      const targetSection = document.getElementById(targetId);
-      
-      if (targetSection) {
-        targetSection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    });
-  });
-});
+}
 </script>
 
-<!-- Enhanced Styles for Premium Design -->
+<!-- Enhanced Styles -->
 <style>
 /* Hide scrollbars for horizontal scroll */
 .products-scroll::-webkit-scrollbar,
@@ -411,24 +596,28 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Image fade-in animation */
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Premium hover effects */
+.product-card:hover {
+  transform: translateY(-2px);
 }
 
-/* Mobile categories panel animation */
-#mobileCategoriesPanel {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Premium gradient background */
-.bg-gradient-to-r {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Performance optimizations */
@@ -452,21 +641,6 @@ html {
   
   .scroll-btn {
     transition: none;
-  }
-  
-  #mobileCategoriesPanel {
-    transition: none;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .category-nav-item {
-    border: 2px solid;
-  }
-  
-  .product-card {
-    border: 2px solid;
   }
 }
 
