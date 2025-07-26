@@ -4,8 +4,9 @@ import {
   getDocs, 
   getDoc, 
   query, 
-  where, 
-  orderBy 
+  orderBy,
+  addDoc,
+  serverTimestamp
 } from "firebase/firestore";
 import { db } from "./firebase.js";
 
@@ -63,22 +64,6 @@ export const getAllProducts = async () => {
   }
 };
 
-// Get products by category reference
-export const getProductsByCategory = async (categoryRef) => {
-  try {
-    const q = query(productsCollection, where("category", "==", categoryRef), orderBy("name"));
-    const querySnapshot = await getDocs(q);
-    const products = [];
-    querySnapshot.forEach((doc) => {
-      products.push({ id: doc.id, ...doc.data() });
-    });
-    return products;
-  } catch (error) {
-    console.error("Error getting products by category:", error);
-    return [];
-  }
-};
-
 // Get single product by ID
 export const getProductById = async (productId) => {
   try {
@@ -97,7 +82,7 @@ export const getProductById = async (productId) => {
   }
 };
 
-// Helper function to group products by category for static generation
+// Group products by category for static generation
 export const groupProductsByCategory = async () => {
   try {
     const categories = await getAllCategories();
@@ -115,8 +100,8 @@ export const groupProductsByCategory = async () => {
     
     // Group products by category
     products.forEach(product => {
-      // Extract category ID from reference path
-      const categoryId = product.category.split('/').pop();
+      // Extract category ID from categoryRef path
+      const categoryId = product.categoryRef?.path?.split('/').pop() || product.category;
       if (categorizedProducts[categoryId]) {
         categorizedProducts[categoryId].products.push(product);
       }
@@ -129,40 +114,20 @@ export const groupProductsByCategory = async () => {
   }
 };
 
-// Contact Forms Collection Functions
-export const contactFormsCollection = collection(db, "contactForms");
+// Leads Collection Functions
+export const leadsCollection = collection(db, "leads");
 
-// Add contact form submission
-export const addContactForm = async (formData) => {
+// Add lead submission
+export const addLead = async (leadData) => {
   try {
-    const docRef = await addDoc(contactFormsCollection, {
-      ...formData,
-      submittedAt: new Date(),
+    const docRef = await addDoc(leadsCollection, {
+      ...leadData,
+      submittedAt: serverTimestamp(),
       status: 'new'
     });
-    console.log("Contact form submitted with ID: ", docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error("Error submitting contact form:", error);
-    return null;
-  }
-};
-
-// Catalogue Requests Collection Functions
-export const catalogueRequestsCollection = collection(db, "catalogueRequests");
-
-// Add catalogue request
-export const addCatalogueRequest = async (requestData) => {
-  try {
-    const docRef = await addDoc(catalogueRequestsCollection, {
-      ...requestData,
-      requestedAt: new Date(),
-      status: 'pending'
-    });
-    console.log("Catalogue request submitted with ID: ", docRef.id);
-    return docRef.id;
-  } catch (error) {
-    console.error("Error submitting catalogue request:", error);
+    console.error("Error submitting lead:", error);
     return null;
   }
 };

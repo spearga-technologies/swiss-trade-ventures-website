@@ -4,102 +4,49 @@ import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import ContactModal from '../../components/ContactModal.astro';
+import { getAllProducts, getAllCategories, getProductById, getCategoryById } from '../../lib/firestore.js';
 
-// Demo product data based on your Firebase structure
-export const demoProduct = {
-  id: "demo-product-1",
-  name: "Demo Product",
-  description: "Demo Sample Description",
-  serialNumber: "12KVC",
-  image: "https://firebasestorage.googleapis.com/v0/b/swisstradeventures-admin.firebasestorage.app/o/products%2FbPHLlRBYRZXFgq9eeIRc-1753527879235.jpg?alt=media&token=9095d93d-2f91-4b2a-a4e9-00ee0b1a4a2a",
-  categoryId: "cat1",
-  variations: [
-    {
-      name: "AB 205",
-      attributes: [
-        {
-          title: "SIZE",
-          value: "20G"
-        },
-        {
-          title: "HEIGHT", 
-          value: "12G"
-        }
-      ]
-    }
-  ]
-};
-
-const demoCategory = {
-  id: "cat1",
-  name: "Surgical Instruments",
-  description: "Professional surgical instruments for medical training and education. High-quality tools designed for hands-on learning experiences in surgical procedures and techniques.",
-  image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
-};
-
-// Related products from same category
-const relatedProducts = [
-  {
-    id: "related-1",
-    name: "Professional Surgical Scalpel Set",
-    description: "High-precision surgical scalpel set with multiple blade sizes for comprehensive surgical training. Ergonomic design for optimal handling and control.",
-    serialNumber: "SS-2024-001",
-    categoryId: "cat1",
-    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-    variations: [
-      {
-        name: "Standard Set",
-        attributes: [
-          { title: "Blade Sizes", value: "10, 11, 15, 22" },
-          { title: "Handle Material", value: "Stainless Steel" }
-        ]
-      }
-    ]
-  },
-  {
-    id: "related-2", 
-    name: "Surgical Forceps Collection",
-    description: "Complete collection of surgical forceps for various medical procedures. Precision-engineered instruments for professional medical training programs.",
-    serialNumber: "SF-2024-002",
-    categoryId: "cat1",
-    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-    variations: [
-      {
-        name: "Basic Collection",
-        attributes: [
-          { title: "Types", value: "Tissue, Hemostatic, Dressing" },
-          { title: "Length", value: "12-16 cm" }
-        ]
-      }
-    ]
-  },
-  {
-    id: "related-3",
-    name: "Surgical Scissors Set", 
-    description: "Professional-grade surgical scissors designed for precision cutting in medical training environments. Multiple types for different surgical applications.",
-    serialNumber: "SC-2024-003",
-    categoryId: "cat1",
-    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-    variations: [
-      {
-        name: "Standard Set",
-        attributes: [
-          { title: "Types", value: "Straight, Curved, Dissecting" },
-          { title: "Material", value: "German Stainless Steel" }
-        ]
-      }
-    ]
-  }
-];
-
-// For static generation - return demo product for all paths
+// Generate static paths for all products
 export async function getStaticPaths() {
-  return [
-    { params: { id: "demoProduct" }, props: { product: demoProduct } }
-  ];
+  try {
+    const products = await getAllProducts();
+    const categories = await getAllCategories();
+    
+    // Create a map of categories for easy lookup
+    const categoryMap = {};
+    categories.forEach(cat => {
+      categoryMap[cat.id] = cat;
+    });
+    
+    return products.map((product) => {
+      // Get category ID from categoryRef
+      const categoryId = product.categoryRef?.path?.split('/').pop() || product.category;
+      const category = categoryMap[categoryId];
+      
+      // Get related products from same category
+      const relatedProducts = products
+        .filter(p => {
+          const pCategoryId = p.categoryRef?.path?.split('/').pop() || p.category;
+          return pCategoryId === categoryId && p.id !== product.id;
+        })
+        .slice(0, 3); // Limit to 3 related products
+      
+      return {
+        params: { id: product.id },
+        props: { 
+          product,
+          category: category || { id: categoryId, name: 'Unknown Category', description: '', image: '' },
+          relatedProducts
+        }
+      };
+    });
+  } catch (error) {
+    console.error('Error generating static paths:', error);
+    return [];
+  }
 }
 
-const { product } = Astro.props;
+const { product, category, relatedProducts } = Astro.props;
 
 // Generate structured data for SEO
 const structuredData = {
@@ -109,7 +56,7 @@ const structuredData = {
   "description": product.description,
   "image": product.image,
   "sku": product.serialNumber,
-  "category": demoCategory.name,
+  "category": category.name,
   "manufacturer": {
     "@type": "Organization",
     "name": "Swiss Trade Ventures"
@@ -150,7 +97,7 @@ const structuredData = {
             <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
-            <span class="text-gray-500">{demoCategory.name}</span>
+            <span class="text-gray-500">{category.name}</span>
           </li>
           <li class="flex items-center">
             <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,13 +139,13 @@ const structuredData = {
           <!-- Category Info Card -->
           <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
             <img 
-              src={demoCategory.image}
-              alt={demoCategory.name}
+              src={category.image}
+              alt={category.name}
               class="w-12 h-12 object-cover rounded-lg"
             />
             <div>
               <p class="text-sm font-medium text-gray-900">Category</p>
-              <p class="text-sm text-gray-600">{demoCategory.name}</p>
+              <p class="text-sm text-gray-600">{category.name}</p>
             </div>
           </div>
         </div>
@@ -299,7 +246,7 @@ const structuredData = {
       <div class="border-t border-gray-200 pt-16">
         <div class="mb-12">
           <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
-            More from {demoCategory.name}
+            More from {category.name}
           </h2>
           <p class="text-lg text-gray-600">
             Explore other products in this category
@@ -307,20 +254,26 @@ const structuredData = {
         </div>
 
         <!-- Related Products Grid -->
+        {relatedProducts.length > 0 ? (
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {relatedProducts.map((relatedProduct) => (
             <ProductCard product={relatedProduct} />
           ))}
         </div>
+        ) : (
+          <div class="text-center py-12 text-gray-500">
+            <p class="text-lg">No other products available in this category yet.</p>
+          </div>
+        )}
 
         <!-- View All Category Products -->
         <div class="text-center mt-12">
           <a 
-            href="/products#surgical-instruments"
+            href={`/products#${category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
             class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
             style="background-color: #0003ff; hover:background-color: #0002e6;"
           >
-            View All {demoCategory.name}
+            View All {category.name}
             <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
