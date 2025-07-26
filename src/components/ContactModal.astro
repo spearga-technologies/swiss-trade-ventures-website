@@ -13,7 +13,7 @@ const { product } = Astro.props;
 ---
 
 <!-- Contact Modal -->
-<div id="contactModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+<div id="contactModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
   <div class="bg-white rounded-3xl w-full max-w-lg mx-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
     
     <!-- Modal Header -->
@@ -244,7 +244,7 @@ const { product } = Astro.props;
 </div>
 
 <!-- Success Modal -->
-<div id="successModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+<div id="successModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
   <div class="bg-white rounded-3xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
     <div class="text-center">
       <!-- Success Icon -->
@@ -289,7 +289,7 @@ const { product } = Astro.props;
 </div>
 
 <!-- Already Submitted Modal -->
-<div id="alreadySubmittedModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+<div id="alreadySubmittedModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
   <div class="bg-white rounded-3xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
     
     <!-- Modal Header with Close Button -->
@@ -404,7 +404,9 @@ function showModal(modalId) {
   const modal = document.getElementById(modalId);
   const content = modal.querySelector('.modal-content');
   
-  modal.classList.remove('hidden');
+  modal.classList.remove('hidden', 'opacity-0');
+  modal.classList.add('opacity-100');
+  modal.style.pointerEvents = 'auto';
   document.body.style.overflow = 'hidden';
   
   // Animate in
@@ -421,6 +423,9 @@ function hideModal(modalId) {
   // Animate out
   content.style.transform = 'scale(0.95)';
   content.style.opacity = '0';
+  modal.classList.remove('opacity-100');
+  modal.classList.add('opacity-0');
+  modal.style.pointerEvents = 'none';
   
   setTimeout(() => {
     modal.classList.add('hidden');
