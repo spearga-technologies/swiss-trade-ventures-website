@@ -2,23 +2,103 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
-import { getProductById, getCategoryById, getAllProducts } from '../../lib/firestore.js';
+import ProductCard from '../../components/ProductCard.astro';
 
-// Static generation - get all product IDs for static paths
+// Demo product data based on your Firebase structure
+const demoProduct = {
+  id: "demo-product-1",
+  name: "Demo Product",
+  description: "Demo Sample Description",
+  serialNumber: "12KVC",
+  image: "https://firebasestorage.googleapis.com/v0/b/swisstradeventures-admin.firebasestorage.app/o/products%2FbPHLlRBYRZXFgq9eeIRc-1753527879235.jpg?alt=media&token=9095d93d-2f91-4b2a-a4e9-00ee0b1a4a2a",
+  categoryId: "cat1",
+  variations: [
+    {
+      name: "AB 205",
+      attributes: [
+        {
+          title: "SIZE",
+          value: "20G"
+        },
+        {
+          title: "HEIGHT", 
+          value: "12G"
+        }
+      ]
+    }
+  ]
+};
+
+const demoCategory = {
+  id: "cat1",
+  name: "Surgical Instruments",
+  description: "Professional surgical instruments for medical training and education. High-quality tools designed for hands-on learning experiences in surgical procedures and techniques.",
+  image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+};
+
+// Related products from same category
+const relatedProducts = [
+  {
+    id: "related-1",
+    name: "Professional Surgical Scalpel Set",
+    description: "High-precision surgical scalpel set with multiple blade sizes for comprehensive surgical training. Ergonomic design for optimal handling and control.",
+    serialNumber: "SS-2024-001",
+    categoryId: "cat1",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Set",
+        attributes: [
+          { title: "Blade Sizes", value: "10, 11, 15, 22" },
+          { title: "Handle Material", value: "Stainless Steel" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "related-2", 
+    name: "Surgical Forceps Collection",
+    description: "Complete collection of surgical forceps for various medical procedures. Precision-engineered instruments for professional medical training programs.",
+    serialNumber: "SF-2024-002",
+    categoryId: "cat1",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Basic Collection",
+        attributes: [
+          { title: "Types", value: "Tissue, Hemostatic, Dressing" },
+          { title: "Length", value: "12-16 cm" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "related-3",
+    name: "Surgical Scissors Set", 
+    description: "Professional-grade surgical scissors designed for precision cutting in medical training environments. Multiple types for different surgical applications.",
+    serialNumber: "SC-2024-003",
+    categoryId: "cat1",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Set",
+        attributes: [
+          { title: "Types", value: "Straight, Curved, Dissecting" },
+          { title: "Material", value: "German Stainless Steel" }
+        ]
+      }
+    ]
+  }
+];
+
+// For static generation - return demo product for all paths
 export async function getStaticPaths() {
-  const products = await getAllProducts();
-  
-  return products.map((product) => ({
-    params: { id: product.id },
-    props: { product }
-  }));
+  return [
+    { params: { id: "demo-product-1" }, props: { product: demoProduct } }
+  ];
 }
 
 const { product } = Astro.props;
-
-// Get category information
-const categoryId = product.category.split('/').pop();
-const category = await getCategoryById(categoryId);
 
 // Generate structured data for SEO
 const structuredData = {
@@ -28,7 +108,7 @@ const structuredData = {
   "description": product.description,
   "image": product.image,
   "sku": product.serialNumber,
-  "category": category?.name,
+  "category": demoCategory.name,
   "manufacturer": {
     "@type": "Organization",
     "name": "Swiss Trade Ventures"
@@ -45,63 +125,47 @@ const structuredData = {
   
   <Navbar />
   
-  <!-- Breadcrumb Navigation -->
-  <div class="bg-gray-50 border-b border-gray-200 pt-24 pb-4">
+  <!-- Main Product Detail Content -->
+  <div class="bg-white pt-48 lg:pt-40 pb-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-4">
+      
+      <!-- Breadcrumb Navigation -->
+      <nav class="mb-8" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-3 text-sm">
           <li>
-            <div>
-              <a href="/" class="text-gray-400 hover:text-gray-500 transition-colors duration-200">
-                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                </svg>
-                <span class="sr-only">Home</span>
-              </a>
-            </div>
+            <a href="/" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+              Home
+            </a>
           </li>
-          <li>
-            <div class="flex items-center">
-              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-              </svg>
-              <a href="/products" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors duration-200">
-                Products
-              </a>
-            </div>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <a href="/products" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+              Products
+            </a>
           </li>
-          {category && (
-            <li>
-              <div class="flex items-center">
-                <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <span class="ml-4 text-sm font-medium text-gray-500">{category.name}</span>
-              </div>
-            </li>
-          )}
-          <li>
-            <div class="flex items-center">
-              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-              </svg>
-              <span class="ml-4 text-sm font-medium text-gray-900 truncate max-w-xs">{product.name}</span>
-            </div>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="text-gray-500">{demoCategory.name}</span>
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="text-gray-900 font-semibold">{product.name}</span>
           </li>
         </ol>
       </nav>
-    </div>
-  </div>
 
-  <!-- Product Detail Content -->
-  <div class="bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      
       <!-- Back to Products Link -->
       <div class="mb-8">
         <a 
           href="/products" 
-          class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+          class="inline-flex items-center text-sm font-medium transition-colors duration-200"
+          style="color: #0003ff; hover:color: #0002e6;"
         >
           <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -111,7 +175,7 @@ const structuredData = {
       </div>
 
       <!-- Product Details Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         
         <!-- Product Image -->
         <div class="space-y-6">
@@ -120,22 +184,22 @@ const structuredData = {
               src={product.image}
               alt={product.name}
               class="w-full h-full object-cover"
+              loading="eager"
             />
           </div>
           
-          {category && (
-            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-              <img 
-                src={category.image}
-                alt={category.name}
-                class="w-12 h-12 object-cover rounded-lg"
-              />
-              <div>
-                <p class="text-sm font-medium text-gray-900">Category</p>
-                <p class="text-sm text-gray-600">{category.name}</p>
-              </div>
+          <!-- Category Info Card -->
+          <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+            <img 
+              src={demoCategory.image}
+              alt={demoCategory.name}
+              class="w-12 h-12 object-cover rounded-lg"
+            />
+            <div>
+              <p class="text-sm font-medium text-gray-900">Category</p>
+              <p class="text-sm text-gray-600">{demoCategory.name}</p>
             </div>
-          )}
+          </div>
         </div>
 
         <!-- Product Information -->
@@ -143,16 +207,16 @@ const structuredData = {
           
           <!-- Product Header -->
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+            <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
               {product.name}
             </h1>
             
             <div class="flex items-center space-x-4 mb-6">
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                 Serial: {product.serialNumber}
               </span>
               {product.variations && product.variations.length > 0 && (
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                   {product.variations.length} {product.variations.length === 1 ? 'Variation' : 'Variations'}
                 </span>
               )}
@@ -166,25 +230,25 @@ const structuredData = {
           <!-- Product Variations -->
           {product.variations && product.variations.length > 0 && (
             <div class="space-y-6">
-              <h2 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">
+              <h2 class="text-xl font-bold mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
                 Product Variations
               </h2>
               
               <div class="space-y-4">
                 {product.variations.map((variation, index) => (
-                  <div class="border border-gray-200 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                  <div class="rounded-xl p-6 bg-gray-50" style="border: 1px solid #0003ff;">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
                       {variation.name}
                     </h3>
                     
                     {variation.attributes && variation.attributes.length > 0 && (
-                      <div class="grid grid-cols-2 gap-4">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {variation.attributes.map((attribute, attrIndex) => (
-                          <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                          <div class="flex justify-between items-center py-3 px-4 bg-white rounded-lg">
                             <span class="text-sm font-medium text-gray-600">
                               {attribute.title}
                             </span>
-                            <span class="text-sm text-gray-900 font-medium">
+                            <span class="text-sm text-gray-900 font-semibold">
                               {attribute.value}
                             </span>
                           </div>
@@ -200,7 +264,8 @@ const structuredData = {
           <!-- Action Buttons -->
           <div class="space-y-4">
             <button 
-              class="w-full bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              class="w-full text-white px-8 py-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+              style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff;"
               onclick="openContactModal()"
             >
               Request Information
@@ -208,7 +273,8 @@ const structuredData = {
             
             <a 
               href="/request-catalogue"
-              class="w-full inline-flex items-center justify-center px-8 py-4 border border-gray-300 rounded-xl font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              class="w-full inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+              style="border: 1px solid #0003ff; hover:background-color: #f8f9ff; focus:ring-color: #0003ff;"
             >
               Download Catalogue
             </a>
@@ -216,7 +282,7 @@ const structuredData = {
 
           <!-- Additional Information -->
           <div class="bg-blue-50 rounded-xl p-6">
-            <h3 class="text-lg font-semibold text-blue-900 mb-3">
+            <h3 class="text-lg font-semibold text-blue-900 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
               Training Applications
             </h3>
             <p class="text-blue-800 text-sm leading-relaxed">
@@ -227,15 +293,48 @@ const structuredData = {
           </div>
         </div>
       </div>
+
+      <!-- Related Products Section -->
+      <div class="border-t border-gray-200 pt-16">
+        <div class="mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+            More from {demoCategory.name}
+          </h2>
+          <p class="text-lg text-gray-600">
+            Explore other products in this category
+          </p>
+        </div>
+
+        <!-- Related Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {relatedProducts.map((relatedProduct) => (
+            <ProductCard product={relatedProduct} />
+          ))}
+        </div>
+
+        <!-- View All Category Products -->
+        <div class="text-center mt-12">
+          <a 
+            href="/products#surgical-instruments"
+            class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
+            style="background-color: #0003ff; hover:background-color: #0002e6;"
+          >
+            View All {demoCategory.name}
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Contact Modal -->
   <div id="contactModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-xl bg-white">
+    <div class="relative top-20 mx-auto p-5 border w-96 rounded-xl bg-white" style="border-color: #0003ff;">
       <div class="mt-3">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Request Information</h3>
+          <h3 class="text-lg font-semibold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">Request Information</h3>
           <button 
             onclick="closeContactModal()"
             class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -254,7 +353,8 @@ const structuredData = {
               id="name" 
               name="name" 
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-2 focus:outline-none transition-colors duration-200"
+              style="focus:ring-color: #0003ff; focus:border-color: #0003ff;"
             >
           </div>
           
@@ -265,7 +365,8 @@ const structuredData = {
               id="email" 
               name="email" 
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-2 focus:outline-none transition-colors duration-200"
+              style="focus:ring-color: #0003ff; focus:border-color: #0003ff;"
             >
           </div>
           
@@ -275,7 +376,8 @@ const structuredData = {
               id="message" 
               name="message" 
               rows="4"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-2 focus:outline-none transition-colors duration-200"
+              style="focus:ring-color: #0003ff; focus:border-color: #0003ff;"
               placeholder={`I'm interested in learning more about ${product.name}...`}
             ></textarea>
           </div>
@@ -283,7 +385,8 @@ const structuredData = {
           <div class="flex space-x-3 pt-4">
             <button 
               type="submit"
-              class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+              class="flex-1 text-white px-4 py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+              style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff;"
             >
               Send Message
             </button>
@@ -325,9 +428,9 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
   
   // Add product information
   data.product = {
-    name: '{product.name}',
-    serialNumber: '{product.serialNumber}',
-    id: '{product.id}'
+    name: 'Demo Product',
+    serialNumber: '12KVC',
+    id: 'demo-product-1'
   };
   
   // Simulate form submission
