@@ -5,8 +5,23 @@ import Footer from '../components/Footer.astro';
 import CategorySection from '../components/CategorySection.astro';
 import { groupProductsByCategory } from '../lib/firestore.js';
 
-// Fetch real data from Firestore at build time
-const { categories, categorizedProducts } = await groupProductsByCategory();
+// Fetch real data from Firestore at build time with error handling
+let categories = [];
+let categorizedProducts = {};
+
+try {
+  console.log("Fetching data for products page...");
+  const data = await groupProductsByCategory();
+  categories = data.categories;
+  categorizedProducts = data.categorizedProducts;
+  console.log("Successfully fetched data for products page");
+} catch (error) {
+  console.error("Error fetching data for products page:", error);
+  // Fallback data will be used from the firestore.js functions
+  const fallbackData = await groupProductsByCategory();
+  categories = fallbackData.categories;
+  categorizedProducts = fallbackData.categorizedProducts;
+}
 
 // Generate category anchors for navigation
 const categoryAnchors = categories.map(cat => ({
