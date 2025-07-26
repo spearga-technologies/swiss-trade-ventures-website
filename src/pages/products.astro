@@ -474,6 +474,23 @@ const totalProducts = dummyProducts.length;
         </div>
       </div>
 
+      <!-- Mobile Bottom Navigation Bar -->
+      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
+        <div class="px-4 py-3">
+          <div class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
+            {categoryAnchors.map((category) => (
+              <a 
+                href={`#${category.anchor}`}
+                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200"
+                style="border: 1px solid #0003ff;"
+                data-category={category.anchor}
+                {category.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <!-- Mobile Categories Overlay -->
       <div id="mobileCategories" class="lg:hidden fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="mobileOverlay"></div>
