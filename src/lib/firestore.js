@@ -11,25 +11,29 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase.js";
 
-// Enhanced error handling wrapper with timeout
-const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 8000) => {
+// Enhanced error handling wrapper with longer timeout for real data
+const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 15000) => {
   return new Promise(async (resolve) => {
     // Set up timeout
     const timeoutId = setTimeout(() => {
-      console.warn("Firestore operation timed out, using fallback data");
+      console.warn("Firestore operation timed out after", timeoutMs, "ms, using fallback data");
       resolve(fallbackData);
     }, timeoutMs);
 
     try {
+      console.log("Attempting Firestore operation...");
       const result = await operation();
       clearTimeout(timeoutId);
+      console.log("Firestore operation successful");
       resolve(result);
     } catch (error) {
       clearTimeout(timeoutId);
       console.error("Firestore operation error:", error.message);
+      console.error("Error code:", error.code);
+      console.error("Full error:", error);
       
-      // Always return fallback data on any error
-      console.warn("Using fallback data due to error:", error.code || 'unknown');
+      // Return fallback data on any error
+      console.warn("Using fallback data due to error");
       resolve(fallbackData);
     }
   });
@@ -53,8 +57,15 @@ export const getAllCategories = async () => {
     console.log("Fetching categories from Firestore...");
     const querySnapshot = await getDocs(query(categoriesCollection, orderBy("name"), limit(50)));
     const categories = [];
+    
+    if (querySnapshot.empty) {
+      console.log("No categories found in Firestore");
+      return fallbackCategories;
+    }
+    
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+      console.log("Category data:", { id: doc.id, ...data });
       categories.push({ 
         id: doc.id, 
         name: data.name || 'Unnamed Category',
@@ -62,9 +73,10 @@ export const getAllCategories = async () => {
         image: data.image || fallbackCategories[0].image
       });
     });
+    
     console.log(`Successfully fetched ${categories.length} categories from Firestore`);
     return categories.length > 0 ? categories : fallbackCategories;
-  }, fallbackCategories);
+  }, fallbackCategories, 15000);
 };
 
 // Get category by ID with enhanced fallback
@@ -77,11 +89,13 @@ export const getCategoryById = async (categoryId) => {
   };
 
   return withErrorHandling(async () => {
+    console.log("Fetching category by ID:", categoryId);
     const docRef = doc(db, "categories", categoryId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       const data = docSnap.data();
+      console.log("Category found:", { id: docSnap.id, ...data });
       return { 
         id: docSnap.id, 
         name: data.name || fallbackCategory.name,
@@ -92,7 +106,7 @@ export const getCategoryById = async (categoryId) => {
       console.log("Category not found, using fallback");
       return fallbackCategory;
     }
-  }, fallbackCategory);
+  }, fallbackCategory, 10000);
 };
 
 // Products Collection Functions
@@ -126,22 +140,37 @@ export const getAllProducts = async () => {
     console.log("Fetching products from Firestore...");
     const querySnapshot = await getDocs(query(productsCollection, orderBy("name"), limit(100)));
     const products = [];
+    
+    if (querySnapshot.empty) {
+      console.log("No products found in Firestore");
+      return fallbackProducts;
+    }
+    
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+      console.log("Product data:", { id: doc.id, ...data });
+      
+      // Handle categoryRef properly
+      let categoryId = data.category || 'uncategorized';
+      if (data.categoryRef && data.categoryRef.path) {
+        categoryId = data.categoryRef.path.split('/').pop();
+      }
+      
       products.push({ 
         id: doc.id, 
         name: data.name || 'Unnamed Product',
         description: data.description || 'No description available',
         serialNumber: data.serialNumber || 'N/A',
         image: data.image || fallbackProducts[0].image,
-        category: data.category || 'uncategorized',
+        category: categoryId,
         categoryRef: data.categoryRef || null,
         variations: data.variations || []
       });
     });
+    
     console.log(`Successfully fetched ${products.length} products from Firestore`);
     return products.length > 0 ? products : fallbackProducts;
-  }, fallbackProducts);
+  }, fallbackProducts, 15000);
 };
 
 // Get single product by ID with enhanced fallback
@@ -157,25 +186,34 @@ export const getProductById = async (productId) => {
   };
 
   return withErrorHandling(async () => {
+    console.log("Fetching product by ID:", productId);
     const docRef = doc(db, "products", productId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       const data = docSnap.data();
+      console.log("Product found:", { id: docSnap.id, ...data });
+      
+      // Handle categoryRef properly
+      let categoryId = data.category || fallbackProduct.category;
+      if (data.categoryRef && data.categoryRef.path) {
+        categoryId = data.categoryRef.path.split('/').pop();
+      }
+      
       return { 
         id: docSnap.id, 
         name: data.name || fallbackProduct.name,
         description: data.description || fallbackProduct.description,
         serialNumber: data.serialNumber || fallbackProduct.serialNumber,
         image: data.image || fallbackProduct.image,
-        category: data.category || fallbackProduct.category,
+        category: categoryId,
         variations: data.variations || []
       };
     } else {
       console.log("Product not found, using fallback");
       return fallbackProduct;
     }
-  }, fallbackProduct);
+  }, fallbackProduct, 10000);
 };
 
 // Group products by category for static generation with enhanced error handling
@@ -220,9 +258,9 @@ export const groupProductsByCategory = async () => {
   };
 
   return withErrorHandling(async () => {
-    console.log("Fetching categories and products...");
+    console.log("Fetching categories and products for grouping...");
     
-    // Use Promise.allSettled to handle partial failures
+    // Fetch both collections with longer timeout
     const [categoriesResult, productsResult] = await Promise.allSettled([
       getAllCategories(),
       getAllProducts()
@@ -231,7 +269,7 @@ export const groupProductsByCategory = async () => {
     const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : fallbackData.categories;
     const products = productsResult.status === 'fulfilled' ? productsResult.value : fallbackData.categorizedProducts["demo-category"].products;
     
-    console.log(`Fetched ${categories.length} categories and ${products.length} products`);
+    console.log(`Processing ${categories.length} categories and ${products.length} products`);
     
     const categorizedProducts = {};
     
@@ -252,10 +290,13 @@ export const groupProductsByCategory = async () => {
         categoryId = product.categoryRef.path.split('/').pop();
       }
       
+      console.log(`Assigning product ${product.name} to category ${categoryId}`);
+      
       if (categorizedProducts[categoryId]) {
         categorizedProducts[categoryId].products.push(product);
       } else {
         // Create category if it doesn't exist
+        console.log(`Creating new category: ${categoryId}`);
         categorizedProducts[categoryId] = {
           category: {
             id: categoryId,
@@ -268,8 +309,9 @@ export const groupProductsByCategory = async () => {
       }
     });
     
+    console.log("Successfully grouped products by category");
     return { categories, categorizedProducts };
-  }, fallbackData, 10000); // Longer timeout for this complex operation
+  }, fallbackData, 20000); // Longer timeout for this complex operation
 };
 
 // Leads Collection Functions
@@ -278,11 +320,13 @@ export const leadsCollection = collection(db, "leads");
 // Add lead submission with enhanced error handling
 export const addLead = async (leadData) => {
   return withErrorHandling(async () => {
+    console.log("Adding lead to Firestore:", leadData);
     const docRef = await addDoc(leadsCollection, {
       ...leadData,
       submittedAt: serverTimestamp(),
       status: 'new'
     });
+    console.log("Lead added successfully with ID:", docRef.id);
     return docRef.id;
-  }, null, 5000);
+  }, null, 10000);
 };

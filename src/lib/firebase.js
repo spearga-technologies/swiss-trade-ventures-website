@@ -16,18 +16,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore Database with WebContainer-compatible settings
+// Initialize Firestore Database
 export const db = getFirestore(app);
-
-// Configure Firestore for WebContainer compatibility
-if (typeof window === 'undefined') {
-  // Server-side configuration for static generation
-  try {
-    // Set shorter timeouts for build-time operations
-    db._delegate._databaseId = db._delegate._databaseId;
-  } catch (error) {
-    console.warn('Firestore server configuration warning:', error.message);
-  }
-}
 
 export default app;

@@ -11,43 +11,22 @@ let categorizedProducts = {};
 
 try {
   console.log("Fetching data for products page...");
-  // Wrap in Promise to handle any unhandled rejections
-  const data = await Promise.resolve(groupProductsByCategory()).catch(error => {
-    console.error("Failed to fetch data, using fallback:", error.message);
-    return {
-      categories: [{
-        id: "demo-category",
-        name: "Demo Category", 
-        description: "Demo category for testing",
-        image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
-      }],
-      categorizedProducts: {
-        "demo-category": {
-          category: {
-            id: "demo-category",
-            name: "Demo Category",
-            description: "Demo category for testing", 
-            image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
-          },
-          products: [{
-            id: "demo-product",
-            name: "Demo Product",
-            description: "Demo product for testing purposes",
-            serialNumber: "DEMO001", 
-            image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-            variations: []
-          }]
-        }
-      }
-    };
-  });
+  
+  // Direct call to groupProductsByCategory with better error handling
+  const data = await groupProductsByCategory();
   
   categories = data.categories;
   categorizedProducts = data.categorizedProducts;
-  console.log("Successfully fetched data for products page");
+  
+  console.log("Products page data loaded:");
+  console.log("Categories:", categories.length);
+  console.log("Category IDs:", categories.map(c => c.id));
+  console.log("Products by category:", Object.keys(categorizedProducts));
+  
 } catch (error) {
   console.error("Error fetching data for products page:", error);
-  // Use hardcoded fallback data
+  console.error("Using hardcoded fallback data");
+  
   categories = [{
     id: "demo-category",
     name: "Demo Category",

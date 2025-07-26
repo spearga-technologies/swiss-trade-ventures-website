@@ -11,26 +11,14 @@ export async function getStaticPaths() {
   try {
     console.log("Generating static paths for product pages...");
     
-    // Wrap in Promise.resolve to handle rejections properly
+    // Direct calls with built-in error handling
     const [products, categories] = await Promise.all([
-      Promise.resolve(getAllProducts()).catch(() => [{
-        id: "demo-product",
-        name: "Demo Product", 
-        description: "Demo product description",
-        serialNumber: "DEMO001",
-        image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-        category: "demo-category",
-        variations: []
-      }]),
-      Promise.resolve(getAllCategories()).catch(() => [{
-        id: "demo-category",
-        name: "Demo Category",
-        description: "Demo category",
-        image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
-      }])
+      getAllProducts(),
+      getAllCategories()
     ]);
     
     console.log(`Generating paths for ${products.length} products`);
+    console.log("Product IDs:", products.map(p => p.id));
     
     // Create a map of categories for easy lookup
     const categoryMap = {};
@@ -42,6 +30,8 @@ export async function getStaticPaths() {
       // Get category ID from categoryRef
       const categoryId = product.categoryRef?.path?.split('/').pop() || product.category;
       const category = categoryMap[categoryId];
+      
+      console.log(`Product ${product.id} -> Category ${categoryId}`);
       
       // Get related products from same category
       const relatedProducts = products
