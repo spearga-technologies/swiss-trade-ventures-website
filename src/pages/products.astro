@@ -277,34 +277,6 @@ const totalProducts = dummyProducts.length;
 >
   <Navbar />
   
-  <!-- Breadcrumb Navigation -->
-  <div class="bg-gray-50 border-b border-gray-200 pt-24 pb-4">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-4">
-          <li>
-            <div>
-              <a href="/" class="text-gray-400 hover:text-gray-500 transition-colors duration-200">
-                <svg class="flex-shrink-0 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                </svg>
-                <span class="sr-only">Home</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <div class="flex items-center">
-              <svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-              </svg>
-              <span class="ml-4 text-sm font-medium text-gray-900">Products</span>
-            </div>
-          </li>
-        </ol>
-      </nav>
-    </div>
-  </div>
-
   <!-- Main Products Layout -->
   <div class="min-h-screen bg-white">
     <div class="flex">
@@ -352,9 +324,9 @@ const totalProducts = dummyProducts.length;
 
       <!-- Right Content Area (75% width) -->
       <main class="ml-1/4 w-3/4 min-h-screen">
-        <div class="p-8 pt-16">
+        <div class="pl-16 pr-8 py-8 pt-32">
           
-          <!-- Page Header - Fixed spacing issue -->
+          <!-- Page Header -->
           <div class="mb-16">
             <h1 class="text-4xl font-bold text-gray-900 mb-6" style="font-family: 'Space Grotesk', sans-serif;">
               Medical Equipment Products
@@ -558,6 +530,7 @@ html {
   main {
     margin-left: 0;
     width: 100%;
+    padding-left: 2rem !important;
   }
 }
 
