@@ -1,0 +1,122 @@
+---
+import ProductCard from './ProductCard.astro';
+
+export interface Props {
+  category: {
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+  };
+  products: Array<{
+    id: string;
+    name: string;
+    description: string;
+    serialNumber: string;
+    image: string;
+    variations?: Array<{
+      name: string;
+      attributes: Array<{
+        title: string;
+        value: string;
+      }>;
+    }>;
+  }>;
+}
+
+const { category, products } = Astro.props;
+const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+---
+
+<section 
+  id={anchor}
+  class="category-section mb-20 scroll-mt-40"
+  data-category={anchor}
+>
+  <!-- Category Header -->
+  <div class="flex items-start gap-8 mb-12 p-8 bg-gray-50 rounded-3xl">
+    <!-- Category Image -->
+    <div class="flex-shrink-0">
+      <img 
+        src={category.image}
+        alt={category.name}
+        class="w-40 h-40 object-cover rounded-2xl"
+        loading="lazy"
+      />
+    </div>
+    
+    <!-- Category Info -->
+    <div class="flex-1 space-y-4">
+      <h2 class="text-3xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">
+        {category.name}
+      </h2>
+      <p class="text-lg text-gray-600 leading-relaxed">
+        {category.description}
+      </p>
+      <div class="flex items-center text-sm text-gray-500">
+        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="font-medium">{products.length} {products.length === 1 ? 'product' : 'products'} available</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Horizontal Scroll -->
+  {products.length > 0 ? (
+    <div class="relative">
+      <!-- Scroll Indicators -->
+      <button 
+        class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all duration-200 opacity-0"
+        data-target={`products-${category.id}`}
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      
+      <button 
+        class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all duration-200"
+        data-target={`products-${category.id}`}
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+
+      <!-- Products Container -->
+      <div 
+        id={`products-${category.id}`}
+        class="products-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
+        style="scrollbar-width: none; -ms-overflow-style: none;"
+      >
+        {products.map((product) => (
+          <ProductCard product={product} />
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div class="text-center py-16 text-gray-500">
+      <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"></path>
+      </svg>
+      <p class="text-lg">No products available in this category yet.</p>
+    </div>
+  )}
+</section>
+
+<style>
+/* Hide scrollbars for horizontal scroll */
+.products-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll button hover effects */
+.scroll-btn:hover {
+  transform: translateY(-50%) scale(1.05);
+}
+
+.scroll-btn {
+  transition: all 0.3s ease;
+}
+</style>

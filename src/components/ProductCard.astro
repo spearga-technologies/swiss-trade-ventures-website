@@ -1,0 +1,96 @@
+---
+export interface Props {
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    serialNumber: string;
+    image: string;
+    variations?: Array<{
+      name: string;
+      attributes: Array<{
+        title: string;
+        value: string;
+      }>;
+    }>;
+  };
+}
+
+const { product } = Astro.props;
+---
+
+<article class="product-card flex-shrink-0 w-80 bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-blue-300 transition-all duration-300 group">
+  <!-- Product Image -->
+  <div class="aspect-square overflow-hidden bg-gray-50">
+    <img 
+      src={product.image}
+      alt={product.name}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+  </div>
+  
+  <!-- Product Info -->
+  <div class="p-6 space-y-4">
+    <!-- Product Name -->
+    <h3 class="text-lg font-bold text-gray-900 leading-tight line-clamp-2" style="font-family: 'Space Grotesk', sans-serif;">
+      {product.name}
+    </h3>
+    
+    <!-- Product Description -->
+    <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
+      {product.description}
+    </p>
+    
+    <!-- Serial Number & Variations -->
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+        Serial: {product.serialNumber}
+      </span>
+      {product.variations && product.variations.length > 0 && (
+        <span class="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+          {product.variations.length} {product.variations.length === 1 ? 'Variation' : 'Variations'}
+        </span>
+      )}
+    </div>
+    
+    <!-- View Button -->
+    <a 
+      href={`/products/${product.id}`}
+      class="inline-flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 group-hover:bg-blue-700"
+      style="font-family: 'Space Grotesk', sans-serif;"
+    >
+      View Specifications
+      <svg class="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </a>
+  </div>
+</article>
+
+<style>
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Premium hover effects */
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Button hover animation */
+.product-card:hover .group-hover\:translate-x-1 {
+  transform: translateX(4px);
+}
+</style>

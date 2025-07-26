@@ -2,18 +2,273 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import { groupProductsByCategory } from '../lib/firestore.js';
+import CategorySection from '../components/CategorySection.astro';
 
-// Static generation - fetch data at build time
-const { categories, categorizedProducts } = await groupProductsByCategory();
+// Dummy data for demonstration
+const dummyCategories = [
+  {
+    id: "cat1",
+    name: "Surgical Instruments",
+    description: "Professional surgical instruments for medical training and education. High-quality tools designed for hands-on learning experiences in surgical procedures and techniques.",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+  },
+  {
+    id: "cat2",
+    name: "Diagnostic Equipment",
+    description: "Advanced diagnostic tools and equipment for comprehensive medical training. Essential instruments for learning patient assessment and diagnostic procedures.",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+  },
+  {
+    id: "cat3",
+    name: "Patient Care Supplies",
+    description: "Complete range of patient care supplies and consumables for medical training environments. Quality products for hands-on healthcare education.",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+  },
+  {
+    id: "cat4",
+    name: "Laboratory Equipment",
+    description: "State-of-the-art laboratory equipment for medical and scientific training. Professional-grade instruments for educational laboratory settings.",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+  },
+  {
+    id: "cat5",
+    name: "Emergency Medicine",
+    description: "Critical emergency medicine equipment for training healthcare professionals. Essential tools for emergency response and trauma care education.",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+  }
+];
+
+const dummyProducts = [
+  // Surgical Instruments
+  {
+    id: "prod1",
+    name: "Professional Surgical Scalpel Set",
+    description: "High-precision surgical scalpel set with multiple blade sizes for comprehensive surgical training. Ergonomic design for optimal handling and control.",
+    serialNumber: "SS-2024-001",
+    categoryId: "cat1",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Set",
+        attributes: [
+          { title: "Blade Sizes", value: "10, 11, 15, 22" },
+          { title: "Handle Material", value: "Stainless Steel" }
+        ]
+      },
+      {
+        name: "Extended Set",
+        attributes: [
+          { title: "Blade Sizes", value: "10, 11, 12, 15, 20, 22, 23" },
+          { title: "Handle Material", value: "Titanium Alloy" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prod2",
+    name: "Surgical Forceps Collection",
+    description: "Complete collection of surgical forceps for various medical procedures. Precision-engineered instruments for professional medical training programs.",
+    serialNumber: "SF-2024-002",
+    categoryId: "cat1",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Basic Collection",
+        attributes: [
+          { title: "Types", value: "Tissue, Hemostatic, Dressing" },
+          { title: "Length", value: "12-16 cm" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prod3",
+    name: "Surgical Scissors Set",
+    description: "Professional-grade surgical scissors designed for precision cutting in medical training environments. Multiple types for different surgical applications.",
+    serialNumber: "SC-2024-003",
+    categoryId: "cat1",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Set",
+        attributes: [
+          { title: "Types", value: "Straight, Curved, Dissecting" },
+          { title: "Material", value: "German Stainless Steel" }
+        ]
+      }
+    ]
+  },
+  
+  // Diagnostic Equipment
+  {
+    id: "prod4",
+    name: "Digital Stethoscope Pro",
+    description: "Advanced digital stethoscope with noise cancellation and recording capabilities. Perfect for medical training and patient assessment education.",
+    serialNumber: "DS-2024-004",
+    categoryId: "cat2",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Model",
+        attributes: [
+          { title: "Frequency Range", value: "20Hz - 20kHz" },
+          { title: "Battery Life", value: "40 hours" }
+        ]
+      },
+      {
+        name: "Advanced Model",
+        attributes: [
+          { title: "Frequency Range", value: "5Hz - 25kHz" },
+          { title: "Battery Life", value: "60 hours" },
+          { title: "Features", value: "Bluetooth, Recording" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prod5",
+    name: "Blood Pressure Monitor Set",
+    description: "Professional blood pressure monitoring system for medical training. Accurate measurements with digital display and multiple cuff sizes.",
+    serialNumber: "BP-2024-005",
+    categoryId: "cat2",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Manual Set",
+        attributes: [
+          { title: "Cuff Sizes", value: "Adult, Large Adult" },
+          { title: "Gauge Type", value: "Aneroid" }
+        ]
+      },
+      {
+        name: "Digital Set",
+        attributes: [
+          { title: "Cuff Sizes", value: "Pediatric, Adult, Large Adult" },
+          { title: "Display", value: "LCD Digital" }
+        ]
+      }
+    ]
+  },
+  
+  // Patient Care Supplies
+  {
+    id: "prod6",
+    name: "Medical Examination Gloves",
+    description: "High-quality disposable examination gloves for medical training and patient care. Latex-free options available for sensitive users.",
+    serialNumber: "EG-2024-006",
+    categoryId: "cat3",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Nitrile Gloves",
+        attributes: [
+          { title: "Material", value: "Nitrile" },
+          { title: "Sizes", value: "S, M, L, XL" },
+          { title: "Quantity", value: "100 per box" }
+        ]
+      },
+      {
+        name: "Vinyl Gloves",
+        attributes: [
+          { title: "Material", value: "Vinyl" },
+          { title: "Sizes", value: "S, M, L, XL" },
+          { title: "Quantity", value: "100 per box" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prod7",
+    name: "Sterile Gauze Pads",
+    description: "Premium sterile gauze pads for wound care training and medical procedures. Various sizes available for different applications.",
+    serialNumber: "GP-2024-007",
+    categoryId: "cat3",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Pack",
+        attributes: [
+          { title: "Sizes", value: "2x2, 4x4 inches" },
+          { title: "Quantity", value: "25 per pack" }
+        ]
+      }
+    ]
+  },
+  
+  // Laboratory Equipment
+  {
+    id: "prod8",
+    name: "Digital Microscope System",
+    description: "High-resolution digital microscope for laboratory training and research. Advanced imaging capabilities with computer connectivity.",
+    serialNumber: "DM-2024-008",
+    categoryId: "cat4",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Standard Model",
+        attributes: [
+          { title: "Magnification", value: "40x - 1000x" },
+          { title: "Camera", value: "5MP Digital" }
+        ]
+      },
+      {
+        name: "Professional Model",
+        attributes: [
+          { title: "Magnification", value: "40x - 2000x" },
+          { title: "Camera", value: "12MP Digital" },
+          { title: "Features", value: "WiFi, Touch Screen" }
+        ]
+      }
+    ]
+  },
+  
+  // Emergency Medicine
+  {
+    id: "prod9",
+    name: "Emergency Response Kit",
+    description: "Comprehensive emergency response kit for training healthcare professionals in critical care situations. Contains essential emergency medical supplies.",
+    serialNumber: "ER-2024-009",
+    categoryId: "cat5",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    variations: [
+      {
+        name: "Basic Kit",
+        attributes: [
+          { title: "Components", value: "20 Essential Items" },
+          { title: "Case", value: "Portable Hard Case" }
+        ]
+      },
+      {
+        name: "Advanced Kit",
+        attributes: [
+          { title: "Components", value: "35 Essential Items" },
+          { title: "Case", value: "Rolling Hard Case" },
+          { title: "Features", value: "LED Light, Power Bank" }
+        ]
+      }
+    ]
+  }
+];
+
+// Group products by category
+const categorizedProducts = {};
+dummyCategories.forEach(category => {
+  categorizedProducts[category.id] = {
+    category: category,
+    products: dummyProducts.filter(product => product.categoryId === category.id)
+  };
+});
 
 // Generate category anchors for navigation
-const categoryAnchors = categories.map(cat => ({
+const categoryAnchors = dummyCategories.map(cat => ({
   id: cat.id,
   name: cat.name,
   anchor: cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
   productCount: categorizedProducts[cat.id]?.products?.length || 0
 }));
+
+// Calculate total products
+const totalProducts = dummyProducts.length;
 ---
 
 <Layout 
@@ -63,7 +318,7 @@ const categoryAnchors = categories.map(cat => ({
               Product Categories
             </h2>
             <p class="text-sm text-gray-600">
-              {categories.length} categories • {Object.values(categorizedProducts).reduce((total, cat) => total + cat.products.length, 0)} products
+              {dummyCategories.length} categories • {totalProducts} products
             </p>
           </div>
 
@@ -72,7 +327,7 @@ const categoryAnchors = categories.map(cat => ({
             {categoryAnchors.map((category) => (
               <a 
                 href={`#${category.anchor}`}
-                class="category-nav-item group flex items-center justify-between p-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200"
+                class="category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border border-transparent hover:border-blue-200"
                 data-category={category.anchor}
               >
                 <span class="text-sm font-medium truncate pr-2">{category.name}</span>
@@ -87,7 +342,7 @@ const categoryAnchors = categories.map(cat => ({
           <div class="mt-8 pt-6 border-t border-gray-200">
             <div class="text-center">
               <div class="text-2xl font-bold text-blue-600" style="font-family: 'Space Grotesk', sans-serif;">
-                {Object.values(categorizedProducts).reduce((total, cat) => total + cat.products.length, 0)}
+                {totalProducts}
               </div>
               <div class="text-sm text-gray-600">Total Products</div>
             </div>
@@ -96,147 +351,26 @@ const categoryAnchors = categories.map(cat => ({
       </aside>
 
       <!-- Right Content Area (75% width) -->
-      <main class="ml-1/4 w-3/4 min-h-screen pt-32">
-        <div class="p-8">
+      <main class="ml-1/4 w-3/4 min-h-screen">
+        <div class="p-8 pt-16">
           
-          <!-- Page Header -->
-          <div class="mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+          <!-- Page Header - Fixed spacing issue -->
+          <div class="mb-16">
+            <h1 class="text-4xl font-bold text-gray-900 mb-6" style="font-family: 'Space Grotesk', sans-serif;">
               Medical Equipment Products
             </h1>
-            <p class="text-lg text-gray-600 max-w-3xl">
-              Discover our comprehensive range of premium medical equipment designed for professional healthcare training and education. Each product meets international quality standards and comes with detailed specifications.
+            <p class="text-lg text-gray-600 max-w-3xl leading-relaxed">
+              Discover our comprehensive range of premium medical equipment designed for professional healthcare training and education. Each product meets international quality standards and comes with detailed specifications for optimal learning experiences.
             </p>
           </div>
 
           <!-- Category Sections -->
-          {Object.entries(categorizedProducts).map(([categoryId, categoryData]) => {
-            const category = categoryData.category;
-            const products = categoryData.products;
-            const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-            
-            return (
-              <section 
-                id={anchor}
-                class="category-section mb-16 scroll-mt-32"
-                data-category={anchor}
-              >
-                <!-- Category Header -->
-                <div class="flex items-start gap-8 mb-8 p-6 bg-gray-50 rounded-2xl">
-                  <!-- Category Image -->
-                  <div class="flex-shrink-0">
-                    <img 
-                      src={category.image}
-                      alt={category.name}
-                      class="w-32 h-32 object-cover rounded-xl shadow-sm"
-                      loading="lazy"
-                    />
-                  </div>
-                  
-                  <!-- Category Info -->
-                  <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
-                      {category.name}
-                    </h2>
-                    <p class="text-gray-600 mb-4 leading-relaxed">
-                      {category.description}
-                    </p>
-                    <div class="flex items-center text-sm text-gray-500">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                      </svg>
-                      {products.length} {products.length === 1 ? 'product' : 'products'} available
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Products Horizontal Scroll -->
-                {products.length > 0 ? (
-                  <div class="relative">
-                    <!-- Scroll Indicators -->
-                    <button 
-                      class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all duration-200 opacity-0"
-                      data-target={`products-${categoryId}`}
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                      </svg>
-                    </button>
-                    
-                    <button 
-                      class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all duration-200"
-                      data-target={`products-${categoryId}`}
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                      </svg>
-                    </button>
-
-                    <!-- Products Container -->
-                    <div 
-                      id={`products-${categoryId}`}
-                      class="products-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
-                      style="scrollbar-width: none; -ms-overflow-style: none;"
-                    >
-                      {products.map((product) => (
-                        <article class="product-card flex-shrink-0 w-80 bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                          <!-- Product Image -->
-                          <div class="aspect-square overflow-hidden bg-gray-100">
-                            <img 
-                              src={product.image}
-                              alt={product.name}
-                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          </div>
-                          
-                          <!-- Product Info -->
-                          <div class="p-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2" style="font-family: 'Space Grotesk', sans-serif;">
-                              {product.name}
-                            </h3>
-                            
-                            <p class="text-sm text-gray-600 mb-3 line-clamp-2">
-                              {product.description}
-                            </p>
-                            
-                            <div class="flex items-center justify-between mb-4">
-                              <span class="text-sm font-medium text-gray-500">
-                                Serial: {product.serialNumber}
-                              </span>
-                              {product.variations && product.variations.length > 0 && (
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                                  {product.variations.length} {product.variations.length === 1 ? 'variation' : 'variations'}
-                                </span>
-                              )}
-                            </div>
-                            
-                            <!-- Action Button -->
-                            <a 
-                              href={`/products/${product.id}`}
-                              class="inline-flex items-center justify-center w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-                            >
-                              View Specifications
-                              <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                              </svg>
-                            </a>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div class="text-center py-12 text-gray-500">
-                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"></path>
-                    </svg>
-                    <p>No products available in this category yet.</p>
-                  </div>
-                )}
-              </section>
-            );
-          })}
+          {Object.entries(categorizedProducts).map(([categoryId, categoryData]) => (
+            <CategorySection 
+              category={categoryData.category} 
+              products={categoryData.products} 
+            />
+          ))}
         </div>
       </main>
     </div>
@@ -351,8 +485,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateScrollButtons(); // Initial check
   });
 
-  // Search functionality removed as requested
-
   // Handle initial hash in URL
   if (window.location.hash) {
     const targetId = window.location.hash.substring(1);
@@ -407,14 +539,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Line clamp utilities */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 /* Image fade-in animation */
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
@@ -435,30 +559,6 @@ html {
     margin-left: 0;
     width: 100%;
   }
-}
-
-/* Product card hover effects */
-.product-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Scroll button positioning */
-.scroll-btn {
-  transition: opacity 0.3s ease, transform 0.2s ease;
-}
-
-.scroll-btn:hover {
-  transform: translateY(-50%) scale(1.05);
-}
-
-/* Category section spacing */
-.category-section:last-child {
-  margin-bottom: 0;
-}
-
-/* Search input focus state */
-#productSearch:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Performance optimizations */
