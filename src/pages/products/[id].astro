@@ -94,7 +94,7 @@ const relatedProducts = [
 // For static generation - return demo product for all paths
 export async function getStaticPaths() {
   return [
-    { params: { id: "demo-product-1" }, props: { product: demoProduct } }
+    { params: { id: "demoProduct" }, props: { product: demoProduct } }
   ];
 }
 
