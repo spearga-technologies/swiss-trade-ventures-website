@@ -212,12 +212,13 @@ function renderCategories() {
 function createCategoryNavItem(category, anchor, productCount, type) {
   const a = document.createElement('a');
   a.href = `#${anchor}`;
-  a.className = `category-nav-item group flex items-center justify-between p-4 rounded-xl text-gray-700 hover:text-white transition-all duration-300 border border-gray-200 hover:border-blue-600 hover:bg-blue-600 hover:shadow-lg transform hover:-translate-y-1`;
+  a.className = `category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent`;
+  a.style.cssText = 'hover:background-color: #0003ff; hover:border-color: #0003ff;';
   a.setAttribute('data-category', anchor);
   
   a.innerHTML = `
-    <span class="text-sm font-semibold truncate pr-2 transition-colors duration-300">${category.name}</span>
-    <span class="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-blue-600 transition-all duration-300 shadow-sm">
+    <span class="text-sm font-medium truncate pr-2">${category.name}</span>
+    <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-200">
       ${productCount}
     </span>
   `;
@@ -228,7 +229,8 @@ function createCategoryNavItem(category, anchor, productCount, type) {
 function createMobileNavItem(category, anchor) {
   const a = document.createElement('a');
   a.href = `#${anchor}`;
-  a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-semibold text-gray-700 hover:text-white hover:bg-blue-600 transition-all duration-300 border border-blue-200 hover:border-blue-600 hover:shadow-md transform hover:-translate-y-0.5';
+  a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200';
+  a.style.cssText = 'border: 1px solid #0003ff;';
   a.setAttribute('data-category', anchor);
   a.textContent = category.name;
   
@@ -334,13 +336,13 @@ function createProductsGrid(products, categoryId) {
 
 function createProductCard(product) {
   const variationsText = product.variations && product.variations.length > 0 
-    ? `<span class="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+    ? `<span class="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
          ${product.variations.length} ${product.variations.length === 1 ? 'Variation' : 'Variations'}
        </span>`
     : '';
 
   return `
-    <article class="product-card flex-shrink-0 w-72 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group flex flex-col hover:border-blue-600 hover:shadow-xl transform hover:-translate-y-2">
+    <article class="product-card flex-shrink-0 w-72 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group flex flex-col" style="hover:border-color: #0003ff;">
       <!-- Product Image -->
       <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50 flex-shrink-0">
         <img 
@@ -365,7 +367,7 @@ function createProductCard(product) {
         
         <!-- Serial Number & Variations -->
         <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+          <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             Serial: ${product.serialNumber}
           </span>
           ${variationsText}
@@ -374,8 +376,8 @@ function createProductCard(product) {
         <!-- View Button -->
         <a 
           href="/products/${product.id}"
-          class="inline-flex items-center justify-center w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 mt-auto transform hover:-translate-y-0.5 hover:shadow-lg"
-          style="font-family: 'Space Grotesk', sans-serif;"
+          class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 mt-auto"
+          style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff; font-family: 'Space Grotesk', sans-serif;"
         >
           View Specifications
           <svg class="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,9 +440,11 @@ function setupNavigation() {
       if (targetSection) {
         // Update active state for mobile nav
         mobileBottomNavItems.forEach(nav => {
-          nav.classList.remove('active-mobile');
+          nav.style.backgroundColor = 'white';
+          nav.style.color = '#374151';
         });
-        this.classList.add('active-mobile');
+        this.style.backgroundColor = '#0003ff';
+        this.style.color = 'white';
         
         targetSection.scrollIntoView({
           behavior: 'smooth',
@@ -521,18 +525,9 @@ function setupIntersectionObserver() {
         // Update active navigation item
         const categoryNavItems = document.querySelectorAll('.category-nav-item');
         categoryNavItems.forEach(nav => {
-          nav.classList.remove('active-category');
+          nav.classList.remove('active');
           if (nav.getAttribute('data-category') === categoryId) {
-            nav.classList.add('active-category');
-          }
-        });
-        
-        // Update mobile nav active state
-        const mobileNavItems = document.querySelectorAll('.mobile-bottom-nav-item');
-        mobileNavItems.forEach(nav => {
-          nav.classList.remove('active-mobile');
-          if (nav.getAttribute('data-category') === categoryId) {
-            nav.classList.add('active-mobile');
+            nav.classList.add('active');
           }
         });
       }
@@ -567,43 +562,28 @@ function handleInitialHash() {
   display: none;
 }
 
-/* Enhanced Active category navigation state */
-.category-nav-item.active-category {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  border-color: #2563eb !important;
+/* Active category navigation state */
+.category-nav-item.active {
+  background-color: #0003ff !important;
+  border-color: #0003ff !important;
   color: white !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3) !important;
 }
 
-.category-nav-item.active-category span:last-child {
-  background: rgba(255, 255, 255, 0.95) !important;
-  color: #2563eb !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+.category-nav-item.active span:last-child {
+  background-color: white !important;
+  color: #0003ff !important;
 }
 
-/* Enhanced Category nav hover effects */
-.category-nav-item:hover:not(.active-category) {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  border-color: #2563eb !important;
+/* Category nav hover effects */
+.category-nav-item:hover {
+  background-color: #0003ff !important;
+  border-color: #0003ff !important;
   color: white !important;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25) !important;
 }
 
-.category-nav-item:hover:not(.active-category) span:last-child {
-  background: rgba(255, 255, 255, 0.95) !important;
-  color: #2563eb !important;
-  font-weight: 700 !important;
-}
-
-/* Mobile nav active state */
-.mobile-bottom-nav-item.active-mobile {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  color: white !important;
-  border-color: #2563eb !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3) !important;
+.category-nav-item:hover span:last-child {
+  background-color: white !important;
+  color: #0003ff !important;
 }
 
 /* Mobile bottom nav scrollbar hide */
