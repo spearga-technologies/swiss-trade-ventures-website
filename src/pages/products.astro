@@ -283,8 +283,8 @@ const totalProducts = dummyProducts.length;
       
       <!-- Left Sidebar - Fixed Categories Index -->
       <aside class="fixed left-0 top-32 w-80 z-30 p-6 h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block">
-      <aside class="fixed left-0 top-32 w-80 z-30 p-4 h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block">
-        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg border" style="border-color: #0003ff;">
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl border border-blue-500 p-6 shadow-lg">
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-lg" style="border: 1px solid #0003ff;">
           <!-- Sidebar Header -->
           <div class="mb-8">
             <h2 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
@@ -300,7 +300,8 @@ const totalProducts = dummyProducts.length;
             {categoryAnchors.map((category) => (
               <a 
                 href={`#${category.anchor}`}
-                class="category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200"
+                class="category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent"
+                style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
                 data-category={category.anchor}
               >
                 <span class="text-sm font-medium truncate pr-2">{category.name}</span>
@@ -316,13 +317,14 @@ const totalProducts = dummyProducts.length;
 
       <!-- Mobile Categories Toggle -->
       <!-- Mobile Bottom Navigation Bar -->
-      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200">
+      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
         <div class="px-4 py-3">
           <div class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
             {categoryAnchors.map((category) => (
               <a 
                 href={`#${category.anchor}`}
-                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200 border border-gray-200"
+                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200"
+                style="border: 1px solid #0003ff;"
                 data-category={category.anchor}
               >
                 {category.name}
@@ -367,11 +369,11 @@ const totalProducts = dummyProducts.length;
 
       <!-- Main Content Area -->
       <main class="min-h-screen lg:ml-80">
-        <div class="px-6 lg:px-8 py-8 pt-48 lg:pt-40 pb-20 lg:pb-8">
+        <div class="px-6 lg:px-12 py-8 pt-48 lg:pt-40 pb-20 lg:pb-8">
           
           <!-- Page Header -->
           <div class="mb-16 lg:mb-20">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 lg:p-12 border border-gray-200">
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 lg:p-12 border" style="border-color: #0003ff;">
               <h1 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight" style="font-family: 'Space Grotesk', sans-serif;">
                 Medical Equipment Products
               </h1>
@@ -590,6 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Active category navigation state */
 .category-nav-item.active {
   background-color: #0003ff !important;
+  border-color: #0003ff !important;
   color: white !important;
 }
 
@@ -601,6 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Category nav hover effects */
 .category-nav-item:hover {
   background-color: #0003ff !important;
+  border-color: #0003ff !important;
   color: white !important;
 }
 
@@ -610,18 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 /* Mobile bottom nav scrollbar hide */
-.mobile-bottom-nav-item {
-  transition: all 0.3s ease;
-}
-
-.mobile-bottom-nav-item:hover,
-.mobile-bottom-nav-item.active {
-  background-color: #0003ff !important;
-  border-color: #0003ff !important;
-  color: white !important;
-}
-
-.overflow-x-auto::-webkit-scrollbar {
+.mobile-bottom-nav-item::-webkit-scrollbar {
   display: none;
 }
 
