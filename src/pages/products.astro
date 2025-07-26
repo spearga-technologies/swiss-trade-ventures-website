@@ -55,8 +55,8 @@ const categoryAnchors = categories.map(cat => ({
     <div class="flex">
       
       <!-- Left Sidebar - Fixed Categories Index (25% width) -->
-      <aside class="fixed left-0 top-24 h-screen w-1/4 bg-white border-r border-gray-200 overflow-hidden z-30">
-        <div class="p-6">
+      <aside class="fixed left-0 top-32 w-1/4 z-30 p-6">
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl border border-blue-500 p-6 shadow-sm">
           <!-- Sidebar Header -->
           <div class="mb-8">
             <h2 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
@@ -83,27 +83,20 @@ const categoryAnchors = categories.map(cat => ({
             ))}
           </nav>
 
-          <!-- Search Box -->
+          <!-- Total Products Summary -->
           <div class="mt-8 pt-6 border-t border-gray-200">
-            <div class="relative">
-              <input 
-                type="text" 
-                id="productSearch"
-                placeholder="Search products..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              >
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600" style="font-family: 'Space Grotesk', sans-serif;">
+                {Object.values(categorizedProducts).reduce((total, cat) => total + cat.products.length, 0)}
               </div>
+              <div class="text-sm text-gray-600">Total Products</div>
             </div>
           </div>
         </div>
       </aside>
 
       <!-- Right Content Area (75% width) -->
-      <main class="ml-1/4 w-3/4 min-h-screen">
+      <main class="ml-1/4 w-3/4 min-h-screen pt-32">
         <div class="p-8">
           
           <!-- Page Header -->
@@ -125,7 +118,7 @@ const categoryAnchors = categories.map(cat => ({
             return (
               <section 
                 id={anchor}
-                class="category-section mb-16 scroll-mt-8"
+                class="category-section mb-16 scroll-mt-32"
                 data-category={anchor}
               >
                 <!-- Category Header -->
@@ -358,41 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateScrollButtons(); // Initial check
   });
 
-  // Product search functionality
-  const searchInput = document.getElementById('productSearch');
-  const productCards = document.querySelectorAll('.product-card');
-  
-  searchInput.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase().trim();
-    
-    productCards.forEach(card => {
-      const productName = card.querySelector('h3').textContent.toLowerCase();
-      const productDescription = card.querySelector('p').textContent.toLowerCase();
-      const serialNumber = card.querySelector('.text-gray-500').textContent.toLowerCase();
-      
-      const isMatch = productName.includes(searchTerm) || 
-                     productDescription.includes(searchTerm) || 
-                     serialNumber.includes(searchTerm);
-      
-      if (isMatch || searchTerm === '') {
-        card.style.display = 'block';
-        card.style.opacity = '1';
-      } else {
-        card.style.display = 'none';
-        card.style.opacity = '0';
-      }
-    });
-    
-    // Show/hide category sections based on visible products
-    categorySection.forEach(section => {
-      const visibleProducts = section.querySelectorAll('.product-card[style*="display: block"], .product-card:not([style*="display: none"])');
-      if (visibleProducts.length === 0 && searchTerm !== '') {
-        section.style.display = 'none';
-      } else {
-        section.style.display = 'block';
-      }
-    });
-  });
+  // Search functionality removed as requested
 
   // Handle initial hash in URL
   if (window.location.hash) {
