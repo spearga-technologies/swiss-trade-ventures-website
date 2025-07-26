@@ -343,7 +343,7 @@ const totalProducts = dummyProducts.length;
       
       <!-- Left Sidebar - Fixed Categories Index -->
       <aside class="fixed left-0 top-32 w-80 z-30 p-6 h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block">
-        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6" style="border: 1px solid #0003ff;">
+        <div class="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-6" style="border: 2px solid #0003ff;">
           <!-- Sidebar Header -->
           <div class="mb-8">
             <h2 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
@@ -359,12 +359,12 @@ const totalProducts = dummyProducts.length;
             {categoryAnchors.map((category) => (
               <a 
                 href={`#${category.anchor}`}
-                class="category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent"
+                class="category-nav-item group flex items-center justify-between p-4 rounded-xl text-gray-700 hover:text-white transition-all duration-300"
                 style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
                 data-category={category.anchor}
               >
                 <span class="text-sm font-medium truncate pr-2">{category.name}</span>
-                <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-200">
+                <span class="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white text-gray-700 group-hover:bg-white group-hover:text-blue-600 transition-colors duration-300" style="border: 1px solid #e5e7eb;">
                   {category.productCount}
                 </span>
               </a>
@@ -376,13 +376,13 @@ const totalProducts = dummyProducts.length;
 
       <!-- Mobile Categories Toggle -->
       <!-- Mobile Bottom Navigation Bar -->
-      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
+      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-r from-white to-blue-50 border-t" style="border-color: #0003ff;">
         <div class="px-4 py-3">
           <div class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
             {categoryAnchors.map((category) => (
               <a 
                 href={`#${category.anchor}`}
-                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200"
+                class="mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-700 hover:text-white transition-all duration-300"
                 style="border: 1px solid #0003ff;"
                 data-category={category.anchor}
               >
@@ -432,7 +432,7 @@ const totalProducts = dummyProducts.length;
           
           <!-- Page Header -->
           <div class="mb-8 lg:mb-12">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 lg:p-12" style="border: 1px solid #0003ff;">
+            <div class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl p-8 lg:p-12" style="border: 2px solid #0003ff;">
               <h1 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight" style="font-family: 'Space Grotesk', sans-serif;">
                 Medical Equipment Products
               </h1>
@@ -651,25 +651,25 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Active category navigation state */
 .category-nav-item.active {
   background-color: #0003ff !important;
-  border-color: #0003ff !important;
   color: white !important;
 }
 
 .category-nav-item.active span:last-child {
   background-color: white !important;
   color: #0003ff !important;
+  border-color: white !important;
 }
 
 /* Category nav hover effects */
 .category-nav-item:hover {
   background-color: #0003ff !important;
-  border-color: #0003ff !important;
   color: white !important;
 }
 
 .category-nav-item:hover span:last-child {
   background-color: white !important;
   color: #0003ff !important;
+  border-color: white !important;
 }
 
 /* Mobile bottom nav scrollbar hide */
@@ -698,8 +698,8 @@ html {
 }
 
 /* Premium gradient background */
-.bg-gradient-to-r {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #f3e8ff 100%);
 }
 
 /* Performance optimizations */
@@ -709,6 +709,16 @@ html {
 
 .products-scroll {
   contain: layout style;
+}
+
+/* Scroll button hover effects */
+.scroll-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.scroll-btn {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid #0003ff;
 }
 
 /* Accessibility improvements */
