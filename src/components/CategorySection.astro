@@ -60,6 +60,7 @@ const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/
         <span class="font-medium">{products.length} {products.length === 1 ? 'product' : 'products'} available</span>
         <span class="mx-2">•</span>
         <a href="#" class="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
+        <a href="#" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
           View Category
         </a>
       </div>
@@ -71,7 +72,8 @@ const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/
     <div class="relative">
       <!-- Scroll Indicators -->
       <button 
-        class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all duration-200 opacity-0"
+        class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0"
+        style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
         data-target={`products-${category.id}`}
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +82,8 @@ const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/
       </button>
       
       <button 
-        class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 transition-all duration-200"
+        class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200"
+        style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
         data-target={`products-${category.id}`}
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
