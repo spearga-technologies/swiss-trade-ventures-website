@@ -638,22 +638,23 @@ window.closeAlreadySubmittedModal = closeAlreadySubmittedModal;
 .modal-content {
   transform: scale(0.95);
   opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Step transitions */
 .step-content {
-  transition: all 0.3s ease-in-out;
+  transition: all 0.4s ease-in-out;
 }
 
 /* Input focus animations */
 input:focus, select:focus, textarea:focus {
-  transform: translateY(-1px) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15) !important;
 }
 
 /* Button hover effects */
 button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 button:disabled {
@@ -684,7 +685,8 @@ select:focus {
 
 /* Progress bar animation */
 #progressBar {
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 /* Modal centering */
