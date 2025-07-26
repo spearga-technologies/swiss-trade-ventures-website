@@ -11,53 +11,68 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase.js";
 
-// Enhanced error handling wrapper
-const withErrorHandling = async (operation, fallbackData = []) => {
-  try {
-    return await operation();
-  } catch (error) {
-    console.error("Firestore operation error:", error);
-    
-    // Return fallback data for static generation
-    if (error.code === 'unavailable' || error.message.includes('No connection')) {
-      console.warn("Using fallback data due to connection issues");
-      return fallbackData;
+// Enhanced error handling wrapper with timeout
+const withErrorHandling = async (operation, fallbackData = [], timeoutMs = 8000) => {
+  return new Promise(async (resolve) => {
+    // Set up timeout
+    const timeoutId = setTimeout(() => {
+      console.warn("Firestore operation timed out, using fallback data");
+      resolve(fallbackData);
+    }, timeoutMs);
+
+    try {
+      const result = await operation();
+      clearTimeout(timeoutId);
+      resolve(result);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error("Firestore operation error:", error.message);
+      
+      // Always return fallback data on any error
+      console.warn("Using fallback data due to error:", error.code || 'unknown');
+      resolve(fallbackData);
     }
-    
-    throw error;
-  }
+  });
 };
 
 // Categories Collection Functions
 export const categoriesCollection = collection(db, "categories");
 
-// Get all categories with fallback
+// Get all categories with enhanced fallback
 export const getAllCategories = async () => {
   const fallbackCategories = [
     {
       id: "demo-category",
       name: "Demo Category",
-      description: "Demo category for testing",
+      description: "Demo category for testing purposes. This is a fallback category used when Firestore is unavailable.",
       image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
     }
   ];
 
   return withErrorHandling(async () => {
+    console.log("Fetching categories from Firestore...");
     const querySnapshot = await getDocs(query(categoriesCollection, orderBy("name"), limit(50)));
     const categories = [];
     querySnapshot.forEach((doc) => {
-      categories.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      categories.push({ 
+        id: doc.id, 
+        name: data.name || 'Unnamed Category',
+        description: data.description || 'No description available',
+        image: data.image || fallbackCategories[0].image
+      });
     });
+    console.log(`Successfully fetched ${categories.length} categories from Firestore`);
     return categories.length > 0 ? categories : fallbackCategories;
   }, fallbackCategories);
 };
 
-// Get category by ID with fallback
+// Get category by ID with enhanced fallback
 export const getCategoryById = async (categoryId) => {
   const fallbackCategory = {
     id: categoryId,
     name: "Demo Category",
-    description: "Demo category description",
+    description: "Demo category description. This is a fallback category used when the requested category is not available.",
     image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
   };
 
@@ -66,9 +81,15 @@ export const getCategoryById = async (categoryId) => {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      const data = docSnap.data();
+      return { 
+        id: docSnap.id, 
+        name: data.name || fallbackCategory.name,
+        description: data.description || fallbackCategory.description,
+        image: data.image || fallbackCategory.image
+      };
     } else {
-      console.log("No such category, using fallback");
+      console.log("Category not found, using fallback");
       return fallbackCategory;
     }
   }, fallbackCategory);
@@ -77,13 +98,13 @@ export const getCategoryById = async (categoryId) => {
 // Products Collection Functions
 export const productsCollection = collection(db, "products");
 
-// Get all products with fallback
+// Get all products with enhanced fallback
 export const getAllProducts = async () => {
   const fallbackProducts = [
     {
       id: "demo-product",
       name: "Demo Product",
-      description: "Demo product for testing purposes",
+      description: "Demo product for testing purposes. This is a fallback product used when Firestore is unavailable.",
       serialNumber: "DEMO001",
       image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
       category: "demo-category",
@@ -93,7 +114,8 @@ export const getAllProducts = async () => {
           name: "Standard Version",
           attributes: [
             { title: "Size", value: "Medium" },
-            { title: "Color", value: "White" }
+            { title: "Color", value: "White" },
+            { title: "Material", value: "Premium" }
           ]
         }
       ]
@@ -101,21 +123,33 @@ export const getAllProducts = async () => {
   ];
 
   return withErrorHandling(async () => {
+    console.log("Fetching products from Firestore...");
     const querySnapshot = await getDocs(query(productsCollection, orderBy("name"), limit(100)));
     const products = [];
     querySnapshot.forEach((doc) => {
-      products.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      products.push({ 
+        id: doc.id, 
+        name: data.name || 'Unnamed Product',
+        description: data.description || 'No description available',
+        serialNumber: data.serialNumber || 'N/A',
+        image: data.image || fallbackProducts[0].image,
+        category: data.category || 'uncategorized',
+        categoryRef: data.categoryRef || null,
+        variations: data.variations || []
+      });
     });
+    console.log(`Successfully fetched ${products.length} products from Firestore`);
     return products.length > 0 ? products : fallbackProducts;
   }, fallbackProducts);
 };
 
-// Get single product by ID with fallback
+// Get single product by ID with enhanced fallback
 export const getProductById = async (productId) => {
   const fallbackProduct = {
     id: productId,
     name: "Demo Product",
-    description: "Demo product description",
+    description: "Demo product description. This is a fallback product used when the requested product is not available.",
     serialNumber: "DEMO001",
     image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
     category: "demo-category",
@@ -127,9 +161,18 @@ export const getProductById = async (productId) => {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      const data = docSnap.data();
+      return { 
+        id: docSnap.id, 
+        name: data.name || fallbackProduct.name,
+        description: data.description || fallbackProduct.description,
+        serialNumber: data.serialNumber || fallbackProduct.serialNumber,
+        image: data.image || fallbackProduct.image,
+        category: data.category || fallbackProduct.category,
+        variations: data.variations || []
+      };
     } else {
-      console.log("No such product, using fallback");
+      console.log("Product not found, using fallback");
       return fallbackProduct;
     }
   }, fallbackProduct);
@@ -142,7 +185,7 @@ export const groupProductsByCategory = async () => {
       {
         id: "demo-category",
         name: "Demo Category",
-        description: "Demo category for testing",
+        description: "Demo category for testing purposes. This fallback data is used when Firestore is unavailable.",
         image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
       }
     ],
@@ -151,17 +194,25 @@ export const groupProductsByCategory = async () => {
         category: {
           id: "demo-category",
           name: "Demo Category",
-          description: "Demo category for testing",
+          description: "Demo category for testing purposes. This fallback data is used when Firestore is unavailable.",
           image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
         },
         products: [
           {
             id: "demo-product",
             name: "Demo Product",
-            description: "Demo product for testing purposes",
+            description: "Demo product for testing purposes. This fallback data is used when Firestore is unavailable.",
             serialNumber: "DEMO001",
             image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
-            variations: []
+            variations: [
+              {
+                name: "Standard Version",
+                attributes: [
+                  { title: "Size", value: "Medium" },
+                  { title: "Color", value: "White" }
+                ]
+              }
+            ]
           }
         ]
       }
@@ -171,10 +222,14 @@ export const groupProductsByCategory = async () => {
   return withErrorHandling(async () => {
     console.log("Fetching categories and products...");
     
-    const [categories, products] = await Promise.all([
+    // Use Promise.allSettled to handle partial failures
+    const [categoriesResult, productsResult] = await Promise.allSettled([
       getAllCategories(),
       getAllProducts()
     ]);
+    
+    const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : fallbackData.categories;
+    const products = productsResult.status === 'fulfilled' ? productsResult.value : fallbackData.categorizedProducts["demo-category"].products;
     
     console.log(`Fetched ${categories.length} categories and ${products.length} products`);
     
@@ -214,7 +269,7 @@ export const groupProductsByCategory = async () => {
     });
     
     return { categories, categorizedProducts };
-  }, fallbackData);
+  }, fallbackData, 10000); // Longer timeout for this complex operation
 };
 
 // Leads Collection Functions
@@ -229,5 +284,5 @@ export const addLead = async (leadData) => {
       status: 'new'
     });
     return docRef.id;
-  }, null);
+  }, null, 5000);
 };

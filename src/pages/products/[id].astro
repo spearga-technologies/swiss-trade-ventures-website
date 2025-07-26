@@ -10,8 +10,26 @@ import { getAllProducts, getAllCategories, getProductById, getCategoryById } fro
 export async function getStaticPaths() {
   try {
     console.log("Generating static paths for product pages...");
-    const products = await getAllProducts();
-    const categories = await getAllCategories();
+    
+    // Wrap in Promise.resolve to handle rejections properly
+    const [products, categories] = await Promise.all([
+      Promise.resolve(getAllProducts()).catch(() => [{
+        id: "demo-product",
+        name: "Demo Product", 
+        description: "Demo product description",
+        serialNumber: "DEMO001",
+        image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+        category: "demo-category",
+        variations: []
+      }]),
+      Promise.resolve(getAllCategories()).catch(() => [{
+        id: "demo-category",
+        name: "Demo Category",
+        description: "Demo category",
+        image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800"
+      }])
+    ]);
+    
     console.log(`Generating paths for ${products.length} products`);
     
     // Create a map of categories for easy lookup
@@ -44,7 +62,7 @@ export async function getStaticPaths() {
     });
   } catch (error) {
     console.error('Error generating static paths:', error);
-    // Return fallback path to prevent build failure
+    // Always return at least one path to prevent build failure
     return [
       {
         params: { id: 'demo-product' },

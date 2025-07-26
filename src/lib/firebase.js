@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,19 +15,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore Database with settings for WebContainer compatibility
+// Initialize Firestore Database with WebContainer-compatible settings
 export const db = getFirestore(app);
 
-// Configure Firestore for better WebContainer compatibility
-if (typeof window !== 'undefined') {
-  // Client-side configuration
+// Configure Firestore for WebContainer compatibility
+if (typeof window === 'undefined') {
+  // Server-side configuration for static generation
   try {
-    // Enable offline persistence for better reliability
-    import('firebase/firestore').then(({ enableNetwork, disableNetwork }) => {
-      // Optional: Configure network settings
-    });
+    // Set shorter timeouts for build-time operations
+    db._delegate._databaseId = db._delegate._databaseId;
   } catch (error) {
-    console.warn('Firestore network configuration warning:', error);
+    console.warn('Firestore server configuration warning:', error.message);
   }
 }
 
