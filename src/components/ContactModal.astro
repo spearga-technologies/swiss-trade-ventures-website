@@ -13,7 +13,7 @@ const { product } = Astro.props;
 ---
 
 <!-- Contact Modal -->
-<div id="contactModal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
+<div id="contactModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
   <div class="bg-white rounded-3xl w-full max-w-lg mx-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
     
     <!-- Modal Header -->
@@ -244,7 +244,7 @@ const { product } = Astro.props;
 </div>
 
 <!-- Success Modal -->
-<div id="successModal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
+<div id="successModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
   <div class="bg-white rounded-3xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
     <div class="text-center">
       <!-- Success Icon -->
@@ -289,7 +289,7 @@ const { product } = Astro.props;
 </div>
 
 <!-- Already Submitted Modal -->
-<div id="alreadySubmittedModal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
+<div id="alreadySubmittedModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
   <div class="bg-white rounded-3xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
     <div class="text-center">
       <!-- Info Icon -->
@@ -659,10 +659,6 @@ select:focus {
   outline-offset: 2px;
 }
 
-/* Backdrop blur support */
-.backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-}
 
 /* Progress bar animation */
 #progressBar {
