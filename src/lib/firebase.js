@@ -10,7 +10,6 @@ const firebaseConfig = {
   storageBucket: "swisstradeventures-admin.firebasestorage.app",
   messagingSenderId: "251484801619",
   appId: "1:251484801619:web:2b5418b63c39f7271514a6",
-  measurementId: "G-M59VCMVXVN"
 };
 
 // Initialize Firebase
