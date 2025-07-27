@@ -206,12 +206,13 @@ export const getProductsByCategory = async (categoryId) => {
   return withErrorHandling(async () => {
     console.log("🔥 Fetching products for category ID:", categoryId);
     
-    // Query products by categoryRef path
-    const categoryPath = `categories/${categoryId}`;
+    // Create a reference to the category document
+    const categoryDocRef = doc(db, "categories", categoryId);
+    
+    // Query products by categoryRef (Firebase document reference)
     const q = query(
       productsCollection, 
-      where("categoryRef", "==", doc(db, categoryPath)),
-      orderBy("name"),
+      where("categoryRef", "==", categoryDocRef),
       limit(100)
     );
     
@@ -220,7 +221,39 @@ export const getProductsByCategory = async (categoryId) => {
     
     if (querySnapshot.empty) {
       console.log("❌ No products found for category:", categoryId);
-      return [];
+      
+      // Try fallback query using category string field
+      console.log("🔄 Trying fallback query with category string field...");
+      const fallbackQuery = query(
+        productsCollection,
+        where("category", "==", categoryId),
+        limit(100)
+      );
+      
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      
+      if (fallbackSnapshot.empty) {
+        console.log("❌ No products found in fallback query either");
+        return [];
+      }
+      
+      fallbackSnapshot.forEach((doc) => {
+        const data = doc.data();
+        console.log("📦 Fallback product:", { id: doc.id, name: data.name });
+        
+        products.push({
+          id: doc.id,
+          name: data.name || 'Unnamed Product',
+          description: data.description || 'No description available',
+          serialNumber: data.serialNumber || 'N/A',
+          image: data.image || '',
+          category: categoryId,
+          variations: data.variations || []
+        });
+      });
+      
+      console.log(`✅ Found ${products.length} products via fallback query`);
+      return products;
     }
     
     querySnapshot.forEach((doc) => {
@@ -307,11 +340,25 @@ export const groupProductsByCategory = async () => {
     
     // Group products by category
     products.forEach(product => {
-      // Extract category ID from categoryRef path or use direct category field
-      let categoryId = product.category;
+      let categoryId = null;
       
+      // Handle categoryRef (Firebase document reference)
       if (product.categoryRef && product.categoryRef.path) {
         categoryId = product.categoryRef.path.split('/').pop();
+      } 
+      // Fallback to category string field
+      else if (product.category) {
+        // Try to find category by name
+        const matchingCategory = categories.find(cat => 
+          cat.name.toLowerCase() === product.category.toLowerCase() ||
+          cat.id === product.category
+        );
+        categoryId = matchingCategory ? matchingCategory.id : product.category;
+      }
+      
+      if (!categoryId) {
+        console.log(`⚠️ Product ${product.name} has no valid category reference`);
+        return;
       }
       
       console.log(`📦 Assigning product ${product.name} to category ${categoryId}`);
