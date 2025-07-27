@@ -298,15 +298,16 @@ function renderProductPage() {
       </div>
     </div>
 
+    ${renderProductVariations()}
 
     ${renderRelatedProducts()}
-    
-    // Setup variations scroll functionality
-    setupVariationsScroll();
   `;
   
   // Update the ContactModal with real product data
   updateContactModalWithProductData();
+  
+  // Setup variations scroll functionality
+  setupVariationsScroll();
 }
 
 function renderVariationIndicator() {
@@ -362,10 +363,10 @@ function renderProductVariations() {
     const limitedAttributes = variation.attributes ? variation.attributes.slice(0, 3) : [];
     
     return `
-    <div class="flex-shrink-0 w-80 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff; hover:transform: translateY(-2px);">
+    <div class="flex-shrink-0 w-72 bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff; hover:transform: translateY(-2px);">
       <!-- Variation Header -->
-      <div class="p-6 pb-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <h3 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
+      <div class="p-4 pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <h3 class="text-lg font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
           ${variation.name}
         </h3>
         <div class="flex items-center text-sm text-gray-600">
@@ -377,26 +378,26 @@ function renderProductVariations() {
       </div>
       
       <!-- Variation Attributes -->
-      <div class="p-6 pt-4">
+      <div class="p-4 pt-3">
         ${limitedAttributes.length > 0 ? `
-        <div class="space-y-4">
+        <div class="space-y-3">
           ${limitedAttributes.map(attribute => `
-          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl transition-colors duration-200 hover:bg-gray-100">
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg transition-colors duration-200 hover:bg-gray-100">
             <div class="flex items-center space-x-3">
               <div class="w-2 h-2 rounded-full bg-blue-500"></div>
               <span class="text-sm font-semibold text-gray-700">
                 ${attribute.title}
               </span>
             </div>
-            <span class="text-sm text-gray-900 font-bold px-3 py-1 bg-white rounded-full border">
+            <span class="text-xs text-gray-900 font-bold px-2 py-1 bg-white rounded-full border">
               ${attribute.value}
             </span>
           </div>
           `).join('')}
         </div>
         ` : `
-        <div class="text-center py-8 text-gray-500">
-          <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="text-center py-6 text-gray-500">
+          <svg class="mx-auto h-8 w-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
           <p class="text-sm">No specifications available</p>
@@ -404,7 +405,7 @@ function renderProductVariations() {
         `}
         
         <!-- Variation Footer -->
-        <div class="mt-6 pt-4 border-t border-gray-100">
+        <div class="mt-4 pt-3 border-t border-gray-100">
           <div class="flex items-center justify-center">
             <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
               Variation ${index + 1}
@@ -418,12 +419,12 @@ function renderProductVariations() {
   
   return `
     <!-- Product Variations Section -->
-    <div class="border-t border-gray-200 pt-16 mb-16">
-      <div class="mb-12">
-        <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+    <div class="border-t border-gray-200 pt-12 mb-12">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-3" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
           Product Variations
         </h2>
-        <p class="text-lg text-gray-600">
+        <p class="text-base text-gray-600">
           Explore different specifications and configurations available for this product
         </p>
       </div>
@@ -432,21 +433,21 @@ function renderProductVariations() {
       <div class="relative">
         <!-- Scroll Indicators -->
         <button 
-          class="variations-scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0 shadow-lg"
+          class="variations-scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0 shadow-md"
           style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
           data-target="variationsContainer"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
         </button>
         
         <button 
-          class="variations-scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 shadow-lg"
+          class="variations-scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 shadow-md"
           style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
           data-target="variationsContainer"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </button>
@@ -454,7 +455,7 @@ function renderProductVariations() {
         <!-- Variations Container -->
         <div 
           id="variationsContainer"
-          class="variations-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
+          class="variations-scroll flex gap-4 overflow-x-auto pb-4 px-2 scroll-smooth"
           style="scrollbar-width: none; -ms-overflow-style: none;"
         >
           ${variationsHtml}
@@ -462,12 +463,12 @@ function renderProductVariations() {
       </div>
 
       <!-- Variations Summary -->
-      <div class="mt-8 text-center">
-        <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
-          <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="mt-6 text-center">
+        <div class="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full">
+          <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          <span class="text-blue-800 font-medium">
+          <span class="text-blue-800 font-medium text-sm">
             ${currentProduct.variations.length} variation${currentProduct.variations.length !== 1 ? 's' : ''} available for this product
           </span>
         </div>
@@ -528,7 +529,7 @@ function renderRelatedProducts() {
   if (!relatedProducts || relatedProducts.length === 0) {
     return `
       <!-- Related Products Section -->
-      <div class="border-t border-gray-200 pt-16">
+      <div class="border-t border-gray-200 pt-12">
         <div class="mb-12">
           <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
             More from ${currentCategory ? currentCategory.name : 'this category'}
@@ -587,7 +588,7 @@ function renderRelatedProducts() {
   
   return `
     <!-- Related Products Section -->
-    <div class="border-t border-gray-200 pt-16">
+    <div class="border-t border-gray-200 pt-12">
       <div class="mb-12">
         <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
           More from ${currentCategory ? currentCategory.name : 'this category'}
