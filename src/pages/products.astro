@@ -192,29 +192,28 @@ function renderCategories() {
   mobileCategoriesNav.innerHTML = '';
   
   categoriesData.forEach(category => {
-    const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const productCount = categorizedProducts[category.id]?.products?.length || 0;
     
     // Desktop navigation
-    const desktopNavItem = createCategoryNavItem(category, anchor, productCount, 'desktop');
+    const desktopNavItem = createCategoryNavItem(category, category.id, productCount, 'desktop');
     categoriesNav.appendChild(desktopNavItem);
     
     // Mobile bottom navigation
-    const mobileNavItem = createMobileNavItem(category, anchor);
+    const mobileNavItem = createMobileNavItem(category, category.id);
     mobileNav.appendChild(mobileNavItem);
     
     // Mobile sidebar navigation
-    const mobileSidebarItem = createCategoryNavItem(category, anchor, productCount, 'mobile');
+    const mobileSidebarItem = createCategoryNavItem(category, category.id, productCount, 'mobile');
     mobileCategoriesNav.appendChild(mobileSidebarItem);
   });
 }
 
 function createCategoryNavItem(category, anchor, productCount, type) {
   const a = document.createElement('a');
-  a.href = `#${anchor}`;
+  a.href = `#${category.id}`;
   a.className = `category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent`;
   a.style.cssText = 'hover:background-color: #0003ff; hover:border-color: #0003ff;';
-  a.setAttribute('data-category', anchor);
+  a.setAttribute('data-category', category.id);
   
   a.innerHTML = `
     <span class="text-sm font-medium truncate pr-2">${category.name}</span>
@@ -228,10 +227,10 @@ function createCategoryNavItem(category, anchor, productCount, type) {
 
 function createMobileNavItem(category, anchor) {
   const a = document.createElement('a');
-  a.href = `#${anchor}`;
+  a.href = `#${category.id}`;
   a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200';
   a.style.cssText = 'border: 1px solid #0003ff;';
-  a.setAttribute('data-category', anchor);
+  a.setAttribute('data-category', category.id);
   a.textContent = category.name;
   
   return a;
@@ -248,12 +247,12 @@ function renderProducts() {
 }
 
 function createCategorySection(category, products) {
-  const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const anchor = category.id; // Use Firebase document ID as anchor
   
   const section = document.createElement('section');
   section.id = anchor;
   section.className = 'category-section mb-20 scroll-mt-40';
-  section.setAttribute('data-category', anchor);
+  section.setAttribute('data-category', category.id);
   
   section.innerHTML = `
     <!-- Category Header -->
@@ -282,8 +281,10 @@ function createCategorySection(category, products) {
           </svg>
           <span class="font-medium">${products.length} ${products.length === 1 ? 'product' : 'products'} available</span>
           <span class="mx-2">•</span>
-          <a href="#" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
-            View Category
+          <a href="/category/${category.id}" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
+            <a href="/category/${category.id}" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
+              View Category
+            </a>
           </a>
         </div>
       </div>

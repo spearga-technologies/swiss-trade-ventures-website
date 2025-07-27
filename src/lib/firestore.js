@@ -204,22 +204,28 @@ export const getProductById = async (productId) => {
 // Get products by category - Dynamic loading
 export const getProductsByCategory = async (categoryId) => {
   return withErrorHandling(async () => {
-    console.log("🔥 Fetching products for category:", categoryId);
+    console.log("🔥 Fetching products for category ID:", categoryId);
     
     // Query products by categoryRef path
     const categoryPath = `categories/${categoryId}`;
     const q = query(
       productsCollection, 
       where("categoryRef", "==", doc(db, categoryPath)),
-      limit(50)
+      orderBy("name"),
+      limit(100)
     );
     
     const querySnapshot = await getDocs(q);
     const products = [];
     
+    if (querySnapshot.empty) {
+      console.log("❌ No products found for category:", categoryId);
+      return [];
+    }
+    
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      console.log("📦 Category product:", { id: doc.id, ...data });
+      console.log("📦 Category product:", { id: doc.id, name: data.name });
       
       products.push({
         id: doc.id,
@@ -234,7 +240,7 @@ export const getProductsByCategory = async (categoryId) => {
     
     console.log(`✅ Found ${products.length} products for category ${categoryId}`);
     return products;
-  }, [], 10000);
+  }, [], 8000);
 };
 
 // Group products by category for dynamic loading
