@@ -1,0 +1,537 @@
+---
+export const prerender = false;
+
+export async function getStaticPaths() {
+  return [];
+}
+
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import ContactModal from '../../components/ContactModal.astro';
+---
+
+<Layout 
+  title="Category Products - Medical Equipment | Swiss Trade Ventures"
+  description="Browse our premium medical equipment products by category. Professional healthcare solutions with detailed specifications."
+>
+  <Navbar />
+  
+  <!-- Main Category Content -->
+  <div class="min-h-screen bg-white pt-48 lg:pt-40 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Loading State -->
+      <div id="loadingState" class="text-center py-16">
+        <div class="inline-flex items-center px-6 py-3 rounded-full" style="background-color: #f0f4ff;">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="color: #0003ff;">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="font-medium" style="color: #0003ff;">Loading category products...</span>
+        </div>
+      </div>
+
+      <!-- Category Content Container -->
+      <div id="categoryContent" class="hidden">
+        <!-- Content will be loaded dynamically -->
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="text-center py-16 hidden">
+        <div class="max-w-md mx-auto">
+          <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Category not found</h3>
+          <p class="text-gray-600 mb-4">The category you're looking for doesn't exist or couldn't be loaded.</p>
+          <a href="/products" class="px-6 py-2 text-white rounded-lg transition-colors" style="background-color: #0003ff; hover:background-color: #0002e6;">
+            View All Products
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal Component -->
+  <ContactModal product={{
+    id: "category-product",
+    name: "Loading...",
+    serialNumber: "...",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    category: "Medical Equipment"
+  }} />
+
+  <Footer />
+</Layout>
+
+<!-- Dynamic Loading Script -->
+<script>
+import { getCategoryById, getProductsByCategory, getAllCategories } from '../../lib/firestore.js';
+
+// Get category ID from URL
+const categoryId = window.location.pathname.split('/').pop();
+let currentCategory = null;
+let categoryProducts = [];
+let allCategories = [];
+
+// Initialize dynamic loading
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log('🚀 Loading category:', categoryId);
+  
+  try {
+    // Show loading state
+    showLoadingState();
+    
+    // Fetch category data and products concurrently
+    const [categoryData, productsData, categoriesData] = await Promise.all([
+      getCategoryById(categoryId),
+      getProductsByCategory(categoryId),
+      getAllCategories()
+    ]);
+    
+    currentCategory = categoryData;
+    categoryProducts = productsData;
+    allCategories = categoriesData;
+    
+    console.log('📂 Loaded category:', currentCategory);
+    console.log('📦 Loaded products:', categoryProducts.length);
+    
+    // Render the category page
+    renderCategoryPage();
+    
+    // Hide loading, show content
+    hideLoadingState();
+    showCategoryContent();
+    
+    // Update page meta
+    updatePageMeta();
+    
+  } catch (error) {
+    console.error('❌ Error loading category:', error);
+    showErrorState();
+  }
+});
+
+function showLoadingState() {
+  document.getElementById('loadingState').classList.remove('hidden');
+  document.getElementById('categoryContent').classList.add('hidden');
+  document.getElementById('errorState').classList.add('hidden');
+}
+
+function hideLoadingState() {
+  document.getElementById('loadingState').classList.add('hidden');
+}
+
+function showCategoryContent() {
+  document.getElementById('categoryContent').classList.remove('hidden');
+}
+
+function showErrorState() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('categoryContent').classList.add('hidden');
+  document.getElementById('errorState').classList.remove('hidden');
+}
+
+function updatePageMeta() {
+  if (currentCategory) {
+    document.title = `${currentCategory.name} - Medical Equipment | Swiss Trade Ventures`;
+    
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.content = `${currentCategory.description} Browse ${categoryProducts.length} premium medical products in ${currentCategory.name} category.`;
+    }
+  }
+}
+
+function renderCategoryPage() {
+  const categoryContent = document.getElementById('categoryContent');
+  
+  categoryContent.innerHTML = `
+    <!-- Breadcrumb Navigation -->
+    <nav class="mb-8" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-3 text-sm">
+        <li>
+          <a href="/" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+            Home
+          </a>
+        </li>
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <a href="/products" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+            Products
+          </a>
+        </li>
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <span class="text-gray-900 font-semibold">${currentCategory.name}</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Back to Products Link -->
+    <div class="mb-8">
+      <a 
+        href="/products" 
+        class="inline-flex items-center text-sm font-medium transition-colors duration-200"
+        style="color: #0003ff; hover:color: #0002e6;"
+      >
+        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to All Products
+      </a>
+    </div>
+
+    <!-- Category Header -->
+    <div class="mb-12">
+      <div class="flex flex-col lg:flex-row lg:items-center gap-8 p-8 rounded-3xl" style="background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);">
+        <!-- Category Image -->
+        <div class="flex-shrink-0">
+          <img 
+            src="${currentCategory.image}"
+            alt="${currentCategory.name}"
+            class="w-32 h-32 lg:w-40 lg:h-40 object-cover rounded-2xl shadow-lg"
+            loading="eager"
+          />
+        </div>
+        
+        <!-- Category Info -->
+        <div class="flex-1 space-y-4">
+          <div class="flex items-center gap-4">
+            <h1 class="text-3xl lg:text-5xl font-bold leading-tight" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+              ${currentCategory.name}
+            </h1>
+            <div class="flex items-center px-4 py-2 rounded-full" style="background-color: #0003ff;">
+              <span class="text-white font-bold text-lg">${categoryProducts.length}</span>
+              <span class="text-white text-sm ml-2">Product${categoryProducts.length !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+          
+          <p class="text-lg lg:text-xl text-gray-700 leading-relaxed max-w-4xl">
+            ${currentCategory.description}
+          </p>
+          
+          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #0003ff;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+              <span class="font-medium">${categoryProducts.length} Products Available</span>
+            </div>
+            <span class="text-gray-400">•</span>
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #0003ff;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="font-medium">Premium Quality</span>
+            </div>
+            <span class="text-gray-400">•</span>
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #0003ff;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"></path>
+              </svg>
+              <span class="font-medium">International Standards</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${renderCategoryProducts()}
+
+    ${renderOtherCategories()}
+  `;
+}
+
+function renderCategoryProducts() {
+  if (categoryProducts.length === 0) {
+    return `
+      <!-- Empty State -->
+      <div class="text-center py-20">
+        <svg class="mx-auto h-20 w-20 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"></path>
+        </svg>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+          No Products Available
+        </h3>
+        <p class="text-lg text-gray-600 mb-8">
+          We're currently updating our ${currentCategory.name} inventory. Please check back soon or explore other categories.
+        </p>
+        <a 
+          href="/products"
+          class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
+          style="background-color: #0003ff; hover:background-color: #0002e6;"
+        >
+          View All Products
+          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    `;
+  }
+
+  const productsHtml = categoryProducts.map(product => `
+    <article class="product-card bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff; hover:transform: translateY(-4px); hover:box-shadow: 0 20px 40px rgba(0, 3, 255, 0.1);">
+      <!-- Product Image -->
+      <div class="aspect-square w-full h-64 overflow-hidden bg-gray-50">
+        <img 
+          src="${product.image}"
+          alt="${product.name}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
+      
+      <!-- Product Info -->
+      <div class="p-6">
+        <!-- Product Name -->
+        <h3 class="text-xl font-bold text-gray-900 leading-tight mb-3 line-clamp-2" style="font-family: 'Space Grotesk', sans-serif;">
+          ${product.name}
+        </h3>
+        
+        <!-- Product Description -->
+        <p class="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">
+          ${product.description}
+        </p>
+        
+        <!-- Serial Number & Variations -->
+        <div class="flex items-center justify-between mb-6">
+          <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Serial: ${product.serialNumber}
+          </span>
+          ${product.variations && product.variations.length > 0 ? `
+          <span class="text-xs font-medium text-white px-3 py-1 rounded-full" style="background-color: #0003ff;">
+            ${product.variations.length} Variation${product.variations.length !== 1 ? 's' : ''}
+          </span>
+          ` : ''}
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <a 
+            href="/products/${product.id}"
+            class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl transition-all duration-200"
+            style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
+          >
+            View Specifications
+            <svg class="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+          
+          <button 
+            onclick="openProductModal('${product.id}', '${product.name}', '${product.serialNumber}', '${product.image}')"
+            class="inline-flex items-center justify-center w-full px-4 py-2 text-gray-700 text-sm font-medium rounded-xl border transition-all duration-200 hover:bg-gray-50"
+            style="border-color: #0003ff;"
+          >
+            <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            Request Info
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  return `
+    <!-- Products Section -->
+    <div class="mb-16">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
+            Products in ${currentCategory.name}
+          </h2>
+          <p class="text-gray-600">
+            ${categoryProducts.length} premium medical product${categoryProducts.length !== 1 ? 's' : ''} available
+          </p>
+        </div>
+        
+        <!-- View Toggle (Future Enhancement) -->
+        <div class="hidden sm:flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+          <button class="px-3 py-1 rounded text-sm font-medium text-white" style="background-color: #0003ff;">
+            Grid
+          </button>
+          <button class="px-3 py-1 rounded text-sm font-medium text-gray-600 hover:text-gray-900">
+            List
+          </button>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        ${productsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderOtherCategories() {
+  const otherCategories = allCategories.filter(cat => cat.id !== categoryId).slice(0, 6);
+  
+  if (otherCategories.length === 0) {
+    return '';
+  }
+
+  const categoriesHtml = otherCategories.map(category => `
+    <a 
+      href="/category/${category.id}"
+      class="group block bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300"
+      style="hover:border-color: #0003ff; hover:transform: translateY(-2px);"
+    >
+      <div class="aspect-video w-full h-32 overflow-hidden bg-gray-50">
+        <img 
+          src="${category.image}"
+          alt="${category.name}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200" style="font-family: 'Space Grotesk', sans-serif;">
+          ${category.name}
+        </h3>
+        <p class="text-sm text-gray-600 line-clamp-2">
+          ${category.description}
+        </p>
+      </div>
+    </a>
+  `).join('');
+
+  return `
+    <!-- Other Categories Section -->
+    <div class="border-t border-gray-200 pt-12">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-3" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+          Explore Other Categories
+        </h2>
+        <p class="text-gray-600">
+          Discover more medical equipment categories
+        </p>
+      </div>
+
+      <!-- Categories Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        ${categoriesHtml}
+      </div>
+
+      <!-- View All Categories -->
+      <div class="text-center">
+        <a 
+          href="/products"
+          class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
+          style="background-color: #0003ff; hover:background-color: #0002e6;"
+        >
+          View All Categories
+          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+// Modal functionality for quick product info
+function openProductModal(productId, productName, serialNumber, image) {
+  // Update the contact modal with product data
+  const modal = document.getElementById('contactModal');
+  const productImg = modal.querySelector('.p-4.bg-gray-50 img');
+  const productNameEl = modal.querySelector('.font-bold.text-gray-900.text-lg');
+  const productSerialEl = modal.querySelector('.text-sm.text-gray-600');
+  
+  if (productImg) {
+    productImg.src = image;
+    productImg.alt = productName;
+  }
+  
+  if (productNameEl) {
+    productNameEl.textContent = productName;
+  }
+  
+  if (productSerialEl) {
+    productSerialEl.textContent = `Serial: ${serialNumber}`;
+  }
+  
+  // Open the modal
+  window.openContactModal();
+}
+
+// Make function globally available
+window.openProductModal = openProductModal;
+</script>
+
+<!-- Enhanced Styles -->
+<style>
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Premium hover effects */
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 3, 255, 0.1);
+}
+
+/* Button hover animations */
+button:hover, a:hover {
+  transform: translateY(-1px);
+}
+
+/* Category card hover effects */
+.group:hover {
+  transform: translateY(-2px);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: transform, box-shadow, border-color, background-color, color;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Responsive grid improvements */
+@media (min-width: 1536px) {
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+</style>
