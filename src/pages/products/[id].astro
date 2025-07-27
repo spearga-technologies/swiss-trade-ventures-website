@@ -8,6 +8,7 @@ export async function getStaticPaths() {
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
+import ContactModal from '../../components/ContactModal.astro';
 
 // For dynamic loading, we'll handle the product fetching client-side
 // This page will be a dynamic route that loads data on the client
@@ -56,9 +57,13 @@ import Footer from '../../components/Footer.astro';
   </div>
 
   <!-- Contact Modal Component -->
-  <div id="contactModalContainer">
-    <!-- ContactModal will be rendered here dynamically -->
-  </div>
+  <ContactModal product={{
+    id: "dynamic-product",
+    name: "Loading...",
+    serialNumber: "...",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    category: "Medical Equipment"
+  }} />
 
   <Footer />
 </Layout>
@@ -257,7 +262,7 @@ function renderProductPage() {
           <button 
             class="w-full text-white px-8 py-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
             style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff;"
-            onclick="openContactModal()"
+            onclick="window.openContactModal()"
           >
             Request Information
           </button>
@@ -288,8 +293,8 @@ function renderProductPage() {
     ${renderRelatedProducts()}
   `;
   
-  // Add contact modal
-  renderContactModal();
+  // Update the ContactModal with real product data
+  updateContactModalWithProductData();
 }
 
 function renderProductVariations() {
@@ -431,616 +436,60 @@ function renderRelatedProducts() {
   `;
 }
 
-function renderContactModal() {
-  const contactModalContainer = document.getElementById('contactModalContainer');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateContactModalWithProductData() {
+  // Update product info in the ContactModal component
+  const productImage = document.querySelector('#contactModal .p-4.bg-gray-50 img');
+  const productName = document.querySelector('#contactModal .font-bold.text-gray-900.text-lg');
+  const productSerial = document.querySelector('#contactModal .text-sm.text-gray-600');
+  const productCategory = document.querySelector('#contactModal .text-xs.text-gray-500');
   
-  contactModalContainer.innerHTML = `
-    <!-- Contact Modal -->
-    <div id="contactModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
-      <div class="bg-white rounded-3xl w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
-        
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between p-6 pb-4">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #0003ff;">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">Get Product Information</h3>
-              <p class="text-sm text-gray-500">Step <span id="currentStep">1</span> of 2</p>
-            </div>
-          </div>
-          <button 
-            onclick="closeContactModal()"
-            class="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="p-6">
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="progressBar" class="h-2 rounded-full transition-all duration-500" style="background-color: #0003ff; width: 50%;"></div>
-          </div>
-        </div>
-
-        <!-- Product Info Display -->
-        <div class="px-6 pb-6">
-          <div class="p-4 bg-gray-50 rounded-2xl">
-            <div class="flex items-center space-x-4">
-              <img src="${currentProduct.image}" alt="${currentProduct.name}" class="w-16 h-16 object-cover rounded-xl">
-              <div class="flex-1">
-                <h4 class="font-bold text-gray-900 text-lg" style="font-family: 'Space Grotesk', sans-serif;">${currentProduct.name}</h4>
-                <p class="text-sm text-gray-600">Serial: ${currentProduct.serialNumber}</p>
-                ${currentCategory ? `<p class="text-xs text-gray-500 mt-1">${currentCategory.name}</p>` : ''}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Two-Step Form -->
-        <form id="contactForm" class="px-6 pb-6">
-          
-          <!-- Step 1: Required Information -->
-          <div id="step1" class="step-content">
-            <div class="mb-6">
-              <h4 class="text-lg font-bold mb-2" style="color: rgb(238, 159, 32); font-family: 'Space Grotesk', sans-serif;">
-                Essential Details
-              </h4>
-              <p class="text-sm text-gray-600 mb-6">We need these details to send you the product information</p>
-            </div>
-            
-            <div class="space-y-5">
-              <!-- Name Field -->
-              <div>
-                <label for="contactName" class="block text-sm font-semibold text-gray-700 mb-2">
-                  Full Name <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="contactName" 
-                  name="name" 
-                  required
-                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 text-lg"
-                  placeholder="Enter your full name"
-                >
-              </div>
-              
-              <!-- Email Field -->
-              <div>
-                <label for="contactEmail" class="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address <span class="text-red-500">*</span>
-                </label>
-                <input 
-                  type="email" 
-                  id="contactEmail" 
-                  name="email" 
-                  required
-                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 text-lg"
-                  placeholder="Enter your email address"
-                >
-              </div>
-            </div>
-
-            <!-- Step 1 Navigation -->
-            <div class="flex justify-end mt-8">
-              <button 
-                type="button"
-                id="nextStep"
-                class="px-8 py-4 text-white font-bold rounded-xl transition-all duration-200 text-lg flex items-center space-x-2"
-                style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
-              >
-                <span>Continue</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Step 2: Additional Information -->
-          <div id="step2" class="step-content hidden">
-            <div class="mb-6">
-              <h4 class="text-lg font-bold mb-2" style="color: rgb(238, 159, 32); font-family: 'Space Grotesk', sans-serif;">
-                Additional Information
-              </h4>
-              <p class="text-sm text-gray-600 mb-6">Help us serve you better with these optional details</p>
-            </div>
-            
-            <div class="space-y-5">
-              <!-- Company Field -->
-              <div>
-                <label for="contactCompany" class="block text-sm font-semibold text-gray-600 mb-2">Company Name</label>
-                <input 
-                  type="text" 
-                  id="contactCompany" 
-                  name="company"
-                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400"
-                  placeholder="Enter your company name"
-                >
-              </div>
-              
-              <!-- Phone Field -->
-              <div>
-                <label for="contactPhone" class="block text-sm font-semibold text-gray-600 mb-2">Phone Number</label>
-                <input 
-                  type="tel" 
-                  id="contactPhone" 
-                  name="phone"
-                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400"
-                  placeholder="Enter your phone number"
-                >
-              </div>
-              
-              <!-- Country Field -->
-              <div>
-                <label for="contactCountry" class="block text-sm font-semibold text-gray-600 mb-2">Country</label>
-                <select 
-                  id="contactCountry" 
-                  name="country"
-                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:outline-none transition-all duration-300 text-gray-900"
-                >
-                  <option value="">Select your country</option>
-                  <option value="US">United States</option>
-                  <option value="UK">United Kingdom</option>
-                  <option value="CA">Canada</option>
-                  <option value="AU">Australia</option>
-                  <option value="DE">Germany</option>
-                  <option value="FR">France</option>
-                  <option value="IN">India</option>
-                  <option value="SG">Singapore</option>
-                  <option value="AE">United Arab Emirates</option>
-                  <option value="CH">Switzerland</option>
-                  <option value="JP">Japan</option>
-                  <option value="KR">South Korea</option>
-                  <option value="CN">China</option>
-                  <option value="BR">Brazil</option>
-                  <option value="MX">Mexico</option>
-                  <option value="ZA">South Africa</option>
-                  <option value="NG">Nigeria</option>
-                  <option value="KE">Kenya</option>
-                  <option value="EG">Egypt</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              
-              <!-- Message Field -->
-              <div>
-                <label for="contactMessage" class="block text-sm font-semibold text-gray-600 mb-2">Message</label>
-                <textarea 
-                  id="contactMessage" 
-                  name="message" 
-                  rows="4"
-                  class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:outline-none transition-all duration-300 text-gray-900 placeholder-gray-400 resize-none"
-                  placeholder="I'm interested in learning more about ${currentProduct.name}. Please provide additional information about pricing, availability, and technical specifications."
-                ></textarea>
-              </div>
-            </div>
-
-            <!-- Step 2 Navigation -->
-            <div class="flex justify-between mt-8">
-              <button 
-                type="button"
-                id="prevStep"
-                class="px-6 py-4 text-gray-600 font-semibold rounded-xl transition-all duration-200 hover:bg-gray-100 flex items-center space-x-2"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                <span>Back</span>
-              </button>
-              
-              <button 
-                type="submit"
-                id="submitBtn"
-                class="px-8 py-4 text-white font-bold rounded-xl transition-all duration-200 text-lg flex items-center space-x-2"
-                style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                </svg>
-                <span>Send Request</span>
-              </button>
-            </div>
-          </div>
-        </form>
-        
-        <!-- Support Contact -->
-        <div class="px-6 pb-6 pt-4 border-t border-gray-100 text-center">
-          <p class="text-xs text-gray-500 mb-2">Need immediate assistance?</p>
-          <a 
-            href="mailto:support@swisstradeventures.com" 
-            class="text-sm font-semibold transition-colors duration-300"
-            style="color: #0003ff; hover:color: #0002e6;"
-          >
-            support@swisstradeventures.com
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
-      <div class="bg-white rounded-3xl w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
-        <div class="text-center">
-          <!-- Success Icon -->
-          <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6 mt-8">
-            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          
-          <!-- Success Message -->
-          <div class="px-8 pb-8">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
-              Thank You!
-            </h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              Your information request has been submitted successfully. Our team will review your inquiry and contact you within 24 hours.
-            </p>
-            
-            <!-- Contact Info -->
-            <div class="bg-blue-50 rounded-2xl p-6 mb-6">
-              <p class="text-sm text-gray-700 mb-3 font-semibold">For immediate assistance, contact us at:</p>
-              <a 
-                href="mailto:support@swisstradeventures.com" 
-                class="text-lg font-bold transition-colors duration-300 block"
-                style="color: #0003ff; hover:color: #0002e6;"
-              >
-                support@swisstradeventures.com
-              </a>
-            </div>
-            
-            <!-- Close Button -->
-            <button 
-              onclick="closeSuccessModal()"
-              class="w-full py-4 px-6 text-white font-bold rounded-xl transition-all duration-200 text-lg"
-              style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Already Submitted Modal -->
-    <div id="alreadySubmittedModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden opacity-0 pointer-events-none transition-all duration-300">
-      <div class="bg-white rounded-3xl w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0 modal-content" style="border: 2px solid #0003ff;">
-        
-        <!-- Modal Header with Close Button -->
-        <div class="flex items-center justify-between p-6 pb-4">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">Already Submitted</h3>
-            </div>
-          </div>
-          <button 
-            onclick="closeAlreadySubmittedModal()"
-            class="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="text-center">
-          <!-- Message -->
-          <div class="px-6 pb-6">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
-              We've Got Your Details!
-            </h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              We've already saved your information and will contact you soon. No need to submit again.
-            </p>
-            
-            <!-- Contact Info -->
-            <div class="bg-blue-50 rounded-2xl p-6 mb-6">
-              <p class="text-sm text-gray-700 mb-3 font-semibold">For urgent inquiries, reach out directly:</p>
-              <a 
-                href="mailto:support@swisstradeventures.com" 
-                class="text-lg font-bold transition-colors duration-300 block"
-                style="color: #0003ff; hover:color: #0002e6;"
-              >
-                support@swisstradeventures.com
-              </a>
-            </div>
-            
-            <!-- Close Button -->
-            <button 
-              onclick="closeAlreadySubmittedModal()"
-              class="w-full py-4 px-6 text-white font-bold rounded-xl transition-all duration-200 text-lg"
-              style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
-            >
-              Got It
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Initialize the contact modal functionality
-  initializeContactModal();
-}
-
-function initializeContactModal() {
-  // Import Firebase functions
-  import('firebase/app').then(({ initializeApp }) => {
-    import('firebase/firestore').then(({ getFirestore, collection, addDoc, serverTimestamp }) => {
-      
-      // Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyADADzp8HDoX8dWs8OE2Iv_rWQT01yF8zQ",
-        authDomain: "swisstradeventures-admin.firebaseapp.com",
-        projectId: "swisstradeventures-admin",
-        storageBucket: "swisstradeventures-admin.firebasestorage.app",
-        messagingSenderId: "251484801619",
-        appId: "1:251484801619:web:2b5418b63c39f7271514a6",
-        measurementId: "G-M59VCMVXVN"
-      };
-
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      // Cache key for localStorage
-      const CACHE_KEY = 'swisstradeventures_lead_submitted';
-
-      // Two-step form state
-      let currentStep = 1;
-
-      // Step navigation
-      document.getElementById('nextStep')?.addEventListener('click', nextStep);
-      document.getElementById('prevStep')?.addEventListener('click', prevStep);
-      
-      // Form submission
-      document.getElementById('contactForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Get form elements
-        const name = document.getElementById('contactName').value.trim();
-        const email = document.getElementById('contactEmail').value.trim();
-        const company = document.getElementById('contactCompany').value.trim();
-        const phone = document.getElementById('contactPhone').value.trim();
-        const country = document.getElementById('contactCountry').value;
-        const message = document.getElementById('contactMessage').value.trim();
-        
-        // Validation
-        if (!name || !email) {
-          alert('Please fill in all required fields (Name and Email)');
-          return;
-        }
-        
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          alert('Please enter a valid email address');
-          return;
-        }
-        
-        const submitBtn = document.getElementById('submitBtn');
-        const originalHTML = submitBtn.innerHTML;
-        
-        submitBtn.innerHTML = '<svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Submitting...</span>';
-        submitBtn.disabled = true;
-        submitBtn.style.opacity = '0.7';
-        
-        try {
-          // Get product information from the page
-          const productId = window.location.pathname.split('/').pop() || '';
-          
-          // Prepare data for Firestore
-          const leadData = {
-            // Required fields
-            name: name,
-            email: email,
-            
-            // Optional fields
-            company: company || null,
-            phone: phone || null,
-            country: country || null,
-            message: message || null,
-            
-            // Product information
-            product: {
-              id: productId,
-              name: currentProduct.name,
-              serialNumber: currentProduct.serialNumber,
-              category: currentCategory ? currentCategory.name : 'Medical Equipment'
-            },
-            
-            // Metadata
-            submittedAt: serverTimestamp(),
-            source: 'product_detail_page',
-            status: 'new',
-            userAgent: navigator.userAgent,
-            referrer: document.referrer || null
-          };
-          
-          // Save to Firestore
-          const docRef = await addDoc(collection(db, 'leads'), leadData);
-          console.log('Lead saved with ID: ', docRef.id);
-          
-          // Cache submission to prevent duplicates
-          localStorage.setItem(CACHE_KEY, JSON.stringify({
-            submittedAt: new Date().toISOString(),
-            email: email,
-            leadId: docRef.id
-          }));
-          
-          // Close contact modal and show success
-          hideModal('contactModal');
-          setTimeout(() => showModal('successModal'), 400);
-          
-          // Reset form
-          resetForm();
-          
-        } catch (error) {
-          console.error('Error saving lead:', error);
-          alert('Sorry, there was an error submitting your request. Please try again or contact us directly at support@swisstradeventures.com');
-        } finally {
-          // Reset button state
-          submitBtn.innerHTML = originalHTML;
-          submitBtn.disabled = false;
-          submitBtn.style.opacity = '1';
-        }
-      });
-      
-      function nextStep() {
-        // Validate required fields in step 1
-        const name = document.getElementById('contactName').value.trim();
-        const email = document.getElementById('contactEmail').value.trim();
-        
-        if (!name || !email) {
-          alert('Please fill in all required fields (Name and Email)');
-          return;
-        }
-        
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          alert('Please enter a valid email address');
-          return;
-        }
-        
-        showStep(2);
-      }
-
-      function prevStep() {
-        showStep(1);
-      }
-
-      function showStep(step) {
-        // Hide all steps
-        document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-        
-        // Show current step
-        document.getElementById(`step${step}`).classList.remove('hidden');
-        
-        // Update progress
-        document.getElementById('currentStep').textContent = step;
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = step === 1 ? '50%' : '100%';
-        
-        currentStep = step;
-      }
-
-      function resetForm() {
-        currentStep = 1;
-        showStep(1);
-        document.getElementById('contactForm').reset();
-        
-        // Auto-populate message field
-        const messageField = document.getElementById('contactMessage');
-        if (messageField && !messageField.value && currentProduct) {
-          messageField.value = `I'm interested in learning more about ${currentProduct.name}${currentProduct.serialNumber ? ` (Serial: ${currentProduct.serialNumber})` : ''}. Please provide additional information about pricing, availability, and technical specifications.`;
-        }
-      }
-    });
-  });
-}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// Global functions for modal
-window.openContactModal = function() {
-  // Check if user has already submitted
-  const CACHE_KEY = 'swisstradeventures_lead_submitted';
-  const hasSubmitted = localStorage.getItem(CACHE_KEY);
-  
-  if (hasSubmitted) {
-    showModal('alreadySubmittedModal');
-  } else {
-    showModal('contactModal');
-    resetForm();
+  if (productImage && currentProduct) {
+    productImage.src = currentProduct.image;
+    productImage.alt = currentProduct.name;
   }
-};
-
-window.closeContactModal = function() {
-  hideModal('contactModal');
-  resetForm();
-};
-
-window.closeSuccessModal = function() {
-  hideModal('successModal');
-};
-
-window.closeAlreadySubmittedModal = function() {
-  hideModal('alreadySubmittedModal');
-};
-
-function showModal(modalId) {
-  const modal = document.getElementById(modalId);
-  const content = modal.querySelector('.modal-content');
   
-  modal.classList.remove('hidden', 'opacity-0');
-  modal.classList.add('opacity-100');
-  modal.style.pointerEvents = 'auto';
-  document.body.style.overflow = 'hidden';
-  
-  // Animate in
-  setTimeout(() => {
-    content.style.transform = 'scale(1)';
-    content.style.opacity = '1';
-  }, 10);
-}
-
-function hideModal(modalId) {
-  const modal = document.getElementById(modalId);
-  const content = modal.querySelector('.modal-content');
-  
-  // Animate out
-  content.style.transform = 'scale(0.95)';
-  content.style.opacity = '0';
-  modal.classList.remove('opacity-100');
-  modal.classList.add('opacity-0');
-  modal.style.pointerEvents = 'none';
-  
-  setTimeout(() => {
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
-  }, 300);
-}
-
-function resetForm() {
-  const form = document.getElementById('contactForm');
-  if (form) {
-    form.reset();
-    
-    // Reset to step 1
-    document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-    document.getElementById('step1')?.classList.remove('hidden');
-    
-    // Update progress
-    const currentStepEl = document.getElementById('currentStep');
-    const progressBar = document.getElementById('progressBar');
-    if (currentStepEl) currentStepEl.textContent = '1';
-    if (progressBar) progressBar.style.width = '50%';
-    
-    // Auto-populate message field
-    const messageField = document.getElementById('contactMessage');
-    if (messageField && !messageField.value && currentProduct) {
-      messageField.value = `I'm interested in learning more about ${currentProduct.name}${currentProduct.serialNumber ? ` (Serial: ${currentProduct.serialNumber})` : ''}. Please provide additional information about pricing, availability, and technical specifications.`;
-    }
+  if (productName && currentProduct) {
+    productName.textContent = currentProduct.name;
   }
-};
+  
+  if (productSerial && currentProduct) {
+    productSerial.textContent = `Serial: ${currentProduct.serialNumber}`;
+  }
+  
+  if (productCategory && currentCategory) {
+    productCategory.textContent = currentCategory.name;
+  }
+  
+  // Update message field with product info
+  const messageField = document.getElementById('contactMessage');
+  if (messageField && currentProduct) {
+    messageField.value = `I'm interested in learning more about ${currentProduct.name}${currentProduct.serialNumber ? ` (Serial: ${currentProduct.serialNumber})` : ''}. Please provide additional information about pricing, availability, and technical specifications.`;
+  }
+}
+
+
+
+
+
+
+
 </script>
 
 <!-- Enhanced Styles -->
