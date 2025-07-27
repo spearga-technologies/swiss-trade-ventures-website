@@ -290,7 +290,12 @@ function renderProductPage() {
       </div>
     </div>
 
+    ${renderProductVariations()}
+
     ${renderRelatedProducts()}
+    
+    // Setup variations scroll functionality
+    setupVariationsScroll();
   `;
   
   // Update the ContactModal with real product data
@@ -302,33 +307,172 @@ function renderProductVariations() {
     return '';
   }
   
-  const variationsHtml = currentProduct.variations.map((variation, index) => `
-    <div class="rounded-xl p-6 bg-gray-50" style="border: 1px solid #0003ff;">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
-        ${variation.name}
-      </h3>
-      
-      ${variation.attributes && variation.attributes.length > 0 ? `
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        ${variation.attributes.map(attribute => `
-        <div class="flex justify-between items-center py-3 px-4 bg-white rounded-lg">
-          <span class="text-sm font-medium text-gray-600">
-            ${attribute.title}
-          </span>
-          <span class="text-sm text-gray-900 font-semibold">
-            ${attribute.value}
-          </span>
+  const variationsHtml = currentProduct.variations.map((variation, index) => {
+    // Limit to maximum 3 attributes per variation
+    const limitedAttributes = variation.attributes ? variation.attributes.slice(0, 3) : [];
+    
+    return `
+    <div class="flex-shrink-0 w-80 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff; hover:transform: translateY(-2px);">
+      <!-- Variation Header -->
+      <div class="p-6 pb-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <h3 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
+          ${variation.name}
+        </h3>
+        <div class="flex items-center text-sm text-gray-600">
+          <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>${limitedAttributes.length} Specification${limitedAttributes.length !== 1 ? 's' : ''}</span>
         </div>
-        `).join('')}
       </div>
-      ` : ''}
+      
+      <!-- Variation Attributes -->
+      <div class="p-6 pt-4">
+        ${limitedAttributes.length > 0 ? `
+        <div class="space-y-4">
+          ${limitedAttributes.map(attribute => `
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl transition-colors duration-200 hover:bg-gray-100">
+            <div class="flex items-center space-x-3">
+              <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+              <span class="text-sm font-semibold text-gray-700">
+                ${attribute.title}
+              </span>
+            </div>
+            <span class="text-sm text-gray-900 font-bold px-3 py-1 bg-white rounded-full border">
+              ${attribute.value}
+            </span>
+          </div>
+          `).join('')}
+        </div>
+        ` : `
+        <div class="text-center py-8 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <p class="text-sm">No specifications available</p>
+        </div>
+        `}
+        
+        <!-- Variation Footer -->
+        <div class="mt-6 pt-4 border-t border-gray-100">
+          <div class="flex items-center justify-center">
+            <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              Variation ${index + 1}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
-  `).join('');
+    `;
+  }).join('');
   
   return `
-    <!-- Product Variations -->
-    <div class="space-y-6">
-      <h2 class="text-xl font-bold mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+    <!-- Product Variations Section -->
+    <div class="border-t border-gray-200 pt-16 mb-16">
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+          Product Variations
+        </h2>
+        <p class="text-lg text-gray-600">
+          Explore different specifications and configurations available for this product
+        </p>
+      </div>
+
+      <!-- Horizontal Scrollable Variations -->
+      <div class="relative">
+        <!-- Scroll Indicators -->
+        <button 
+          class="variations-scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0 shadow-lg"
+          style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+          data-target="variationsContainer"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        
+        <button 
+          class="variations-scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 shadow-lg"
+          style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+          data-target="variationsContainer"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <!-- Variations Container -->
+        <div 
+          id="variationsContainer"
+          class="variations-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
+          style="scrollbar-width: none; -ms-overflow-style: none;"
+        >
+          ${variationsHtml}
+        </div>
+      </div>
+
+      <!-- Variations Summary -->
+      <div class="mt-8 text-center">
+        <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
+          <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-blue-800 font-medium">
+            ${currentProduct.variations.length} variation${currentProduct.variations.length !== 1 ? 's' : ''} available for this product
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Setup variations scroll functionality
+function setupVariationsScroll() {
+  const scrollButtons = document.querySelectorAll('.variations-scroll-btn');
+  
+  scrollButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const container = document.getElementById(targetId);
+      const scrollAmount = 320;
+      
+      if (this.classList.contains('scroll-left')) {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Update scroll button visibility
+  const variationsContainer = document.getElementById('variationsContainer');
+  
+  if (variationsContainer) {
+    const leftBtn = document.querySelector('.variations-scroll-btn.scroll-left');
+    const rightBtn = document.querySelector('.variations-scroll-btn.scroll-right');
+    
+    function updateVariationsScrollButtons() {
+      const { scrollLeft, scrollWidth, clientWidth } = variationsContainer;
+      
+      if (scrollLeft > 0) {
+        leftBtn.style.opacity = '1';
+      } else {
+        leftBtn.style.opacity = '0';
+      }
+      
+      if (scrollLeft + clientWidth < scrollWidth - 10) {
+        rightBtn.style.opacity = '1';
+      } else {
+        rightBtn.style.opacity = '0';
+      }
+    }
+    
+    variationsContainer.addEventListener('scroll', updateVariationsScrollButtons);
+    
+    // Initial check
+    setTimeout(updateVariationsScrollButtons, 100);
+  }
+}
         Product Variations
       </h2>
       
