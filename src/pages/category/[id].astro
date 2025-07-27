@@ -386,7 +386,7 @@ function renderOtherCategories() {
       class="group block bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300"
       style="hover:border-color: #0003ff; hover:transform: translateY(-2px);"
     >
-      <div class="aspect-video w-full h-32 overflow-hidden bg-gray-50">
+      <div class="aspect-square w-full overflow-hidden bg-gray-50">
         <img 
           src="${category.image}"
           alt="${category.name}"
@@ -394,13 +394,24 @@ function renderOtherCategories() {
           loading="lazy"
         />
       </div>
-      <div class="p-4">
+      <div class="p-6">
         <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200" style="font-family: 'Space Grotesk', sans-serif;">
           ${category.name}
         </h3>
         <p class="text-sm text-gray-600 line-clamp-2">
           ${category.description}
         </p>
+        
+        <!-- Category Stats -->
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 rounded-full" style="background-color: #0003ff;"></div>
+            <span class="text-xs font-medium text-gray-500">Premium Quality</span>
+          </div>
+          <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
       </div>
     </a>
   `).join('');
@@ -418,7 +429,7 @@ function renderOtherCategories() {
       </div>
 
       <!-- Categories Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6 mb-8">
         ${categoriesHtml}
       </div>
 
@@ -426,7 +437,7 @@ function renderOtherCategories() {
       <div class="text-center">
         <a 
           href="/products"
-          class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
+          class="inline-flex items-center px-8 py-4 text-white font-bold rounded-xl transition-all duration-200 hover:shadow-lg"
           style="background-color: #0003ff; hover:background-color: #0002e6;"
         >
           View All Categories
