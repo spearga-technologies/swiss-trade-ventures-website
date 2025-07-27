@@ -1,169 +1,131 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import Footer from '../components/Footer.astro';
-import CategorySection from '../components/CategorySection.astro';
+export const prerender = false;
+
+export async function getStaticPaths() {
+  return [];
+}
+
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import ContactModal from '../../components/ContactModal.astro';
+
+// For dynamic loading, we'll handle the product fetching client-side
+// This page will be a dynamic route that loads data on the client
 ---
 
 <Layout 
-  title="Medical Equipment Products - Swiss Trade Ventures" 
-  description="Explore our comprehensive range of premium medical equipment and training products. Professional healthcare solutions for medical training institutions worldwide."
+  title="Product Details - Medical Equipment | Swiss Trade Ventures"
+  description="View detailed specifications and information about our premium medical equipment products."
 >
   <Navbar />
   
-  <!-- Main Products Layout -->
-  <div class="min-h-screen bg-white">
-    <div class="relative">
+  <!-- Main Product Detail Content -->
+  <div class="min-h-screen bg-white pt-48 lg:pt-40 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <!-- Left Sidebar - Fixed Categories Index -->
-      <aside class="fixed left-0 top-32 w-80 z-30 p-6 h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block">
-        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6" style="border: 1px solid #0003ff;">
-          <!-- Sidebar Header -->
-          <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
-              Product Categories
-            </h2>
-            <p class="text-sm text-gray-600">
-              Browse our medical equipment categories
-            </p>
-          </div>
-
-          <!-- Categories Navigation -->
-          <nav id="categoriesNav" class="space-y-2" aria-label="Product categories">
-            <!-- Categories will be loaded dynamically -->
-          </nav>
-        </div>
-      </aside>
-
-      <!-- Mobile Categories Toggle -->
-      <!-- Mobile Bottom Navigation Bar -->
-      <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
-        <div class="px-4 py-3">
-          <div id="mobileNav" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
-            <!-- Mobile nav will be loaded dynamically -->
-          </div>
+      <!-- Loading State -->
+      <div id="loadingState" class="text-center py-16">
+        <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-blue-600 font-medium">Loading product details...</span>
         </div>
       </div>
 
-      <!-- Mobile Categories Overlay -->
-      <div id="mobileCategories" class="lg:hidden fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="mobileOverlay"></div>
-        <div class="absolute left-0 top-0 w-80 h-full bg-white/95 backdrop-blur-md p-6 transform -translate-x-full transition-transform duration-300" id="mobileCategoriesPanel">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">
-              Categories
-            </h2>
-            <button id="closeMobileCategories" class="p-2 text-gray-500 hover:text-gray-700">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-          
-          <!-- Mobile Categories Navigation -->
-          <nav id="mobileCategoriesNav" class="space-y-2" aria-label="Product categories">
-            <!-- Mobile categories will be loaded dynamically -->
-          </nav>
-        </div>
+      <!-- Product Content Container -->
+      <div id="productContent" class="hidden">
+        <!-- Content will be loaded dynamically -->
       </div>
 
-      <!-- Main Content Area -->
-      <main class="min-h-screen lg:ml-80">
-        <div class="px-6 lg:px-12 py-8 pt-48 lg:pt-40 pb-20 lg:pb-8">
-          
-          <!-- Page Header -->
-          <div class="mb-8 lg:mb-12">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 lg:p-12" style="border: 1px solid #0003ff;">
-              <h1 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight" style="font-family: 'Space Grotesk', sans-serif;">
-                Medical Equipment Products
-              </h1>
-              <p class="text-lg lg:text-xl text-gray-600 max-w-4xl leading-relaxed mb-8">
-                Discover our comprehensive range of premium medical equipment designed for professional healthcare training and education. Each product meets international quality standards and comes with detailed specifications for optimal learning experiences.
-              </p>
-            </div>
-          </div>
-
-          <!-- Loading State -->
-          <div id="loadingState" class="text-center py-16">
-            <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span class="text-blue-600 font-medium">Loading products from database...</span>
-            </div>
-          </div>
-
-          <!-- Categories and Products Container -->
-          <div id="productsContainer" class="space-y-12 lg:space-y-16 hidden">
-            <!-- Categories will be loaded dynamically -->
-          </div>
-
-          <!-- Error State -->
-          <div id="errorState" class="text-center py-16 hidden">
-            <div class="max-w-md mx-auto">
-              <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Unable to load products</h3>
-              <p class="text-gray-600 mb-4">There was an issue connecting to the database. Please try refreshing the page.</p>
-              <button onclick="window.location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                Refresh Page
-              </button>
-            </div>
-          </div>
+      <!-- Error State -->
+      <div id="errorState" class="text-center py-16 hidden">
+        <div class="max-w-md mx-auto">
+          <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Product not found</h3>
+          <p class="text-gray-600 mb-4">The product you're looking for doesn't exist or couldn't be loaded.</p>
+          <a href="/products" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Back to Products
+          </a>
         </div>
-      </main>
+      </div>
     </div>
   </div>
+
+  <!-- Contact Modal Component -->
+  <ContactModal product={{
+    id: "dynamic-product",
+    name: "Loading...",
+    serialNumber: "...",
+    image: "https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=800",
+    category: "Medical Equipment"
+  }} />
 
   <Footer />
 </Layout>
 
 <!-- Dynamic Loading Script -->
 <script>
-import { fetchGroupedDataClient } from '../lib/firestore.js';
+import { getProductById, getCategoryById, getProductsByCategory } from '../../lib/firestore.js';
 
-// Global state
-let categoriesData = [];
-let categorizedProducts = {};
+// Get product ID from URL
+const productId = window.location.pathname.split('/').pop();
+let currentProduct = null;
+let currentCategory = null;
+let relatedProducts = [];
 
 // Initialize dynamic loading
 document.addEventListener('DOMContentLoaded', async function() {
-  console.log('🚀 Starting dynamic product loading...');
+  console.log('🚀 Loading product:', productId);
   
   try {
     // Show loading state
     showLoadingState();
     
-    // Fetch data dynamically
-    const data = await fetchGroupedDataClient();
-    categoriesData = data.categories;
-    categorizedProducts = data.categorizedProducts;
+    // Fetch all data concurrently for better performance
+    const [productData] = await Promise.all([
+      getProductById(productId)
+    ]);
     
-    console.log('📊 Loaded data:', { 
-      categories: categoriesData.length, 
-      products: Object.keys(categorizedProducts).length 
-    });
+    currentProduct = productData;
+    console.log('📦 Loaded product:', currentProduct);
     
-    // Render the UI
-    renderCategories();
-    renderProducts();
-    setupNavigation();
+    // Fetch category and related products concurrently if category exists
+    if (currentProduct.category) {
+      const [categoryData, relatedProductsData] = await Promise.all([
+        getCategoryById(currentProduct.category),
+        getProductsByCategory(currentProduct.category)
+      ]);
+      
+      currentCategory = categoryData;
+      relatedProducts = relatedProductsData.filter(p => p.id !== productId).slice(0, 3);
+      console.log('📂 Loaded category:', currentCategory);
+      console.log('🔗 Loaded related products:', relatedProducts.length);
+    }
+    
+    // Render the product page
+    renderProductPage();
     
     // Hide loading, show content
     hideLoadingState();
-    showProductsContainer();
+    showProductContent();
+    
+    // Update page title and meta
+    updatePageMeta();
     
   } catch (error) {
-    console.error('❌ Error loading products:', error);
+    console.error('❌ Error loading product:', error);
     showErrorState();
   }
 });
 
 function showLoadingState() {
   document.getElementById('loadingState').classList.remove('hidden');
-  document.getElementById('productsContainer').classList.add('hidden');
+  document.getElementById('productContent').classList.add('hidden');
   document.getElementById('errorState').classList.add('hidden');
 }
 
@@ -171,301 +133,353 @@ function hideLoadingState() {
   document.getElementById('loadingState').classList.add('hidden');
 }
 
-function showProductsContainer() {
-  document.getElementById('productsContainer').classList.remove('hidden');
+function showProductContent() {
+  document.getElementById('productContent').classList.remove('hidden');
 }
 
 function showErrorState() {
   document.getElementById('loadingState').classList.add('hidden');
-  document.getElementById('productsContainer').classList.add('hidden');
+  document.getElementById('productContent').classList.add('hidden');
   document.getElementById('errorState').classList.remove('hidden');
 }
 
-function renderCategories() {
-  const categoriesNav = document.getElementById('categoriesNav');
-  const mobileNav = document.getElementById('mobileNav');
-  const mobileCategoriesNav = document.getElementById('mobileCategoriesNav');
-  
-  // Clear existing content
-  categoriesNav.innerHTML = '';
-  mobileNav.innerHTML = '';
-  mobileCategoriesNav.innerHTML = '';
-  
-  categoriesData.forEach(category => {
-    const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const productCount = categorizedProducts[category.id]?.products?.length || 0;
+function updatePageMeta() {
+  if (currentProduct) {
+    document.title = `${currentProduct.name} - Medical Equipment | Swiss Trade Ventures`;
     
-    // Desktop navigation
-    const desktopNavItem = createCategoryNavItem(category, anchor, productCount, 'desktop');
-    categoriesNav.appendChild(desktopNavItem);
-    
-    // Mobile bottom navigation
-    const mobileNavItem = createMobileNavItem(category, anchor);
-    mobileNav.appendChild(mobileNavItem);
-    
-    // Mobile sidebar navigation
-    const mobileSidebarItem = createCategoryNavItem(category, anchor, productCount, 'mobile');
-    mobileCategoriesNav.appendChild(mobileSidebarItem);
-  });
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.content = `${currentProduct.description} - Professional medical equipment with serial number ${currentProduct.serialNumber}. View detailed specifications and training applications.`;
+    }
+  }
 }
 
-function createCategoryNavItem(category, anchor, productCount, type) {
-  const a = document.createElement('a');
-  a.href = `#${anchor}`;
-  a.className = `category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent`;
-  a.style.cssText = 'hover:background-color: #0003ff; hover:border-color: #0003ff;';
-  a.setAttribute('data-category', anchor);
+function renderProductPage() {
+  const productContent = document.getElementById('productContent');
   
-  a.innerHTML = `
-    <span class="text-sm font-medium truncate pr-2">${category.name}</span>
-    <span class="flex-shrink-0 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 group-hover:bg-white group-hover:text-gray-900 transition-colors duration-200">
-      ${productCount}
-    </span>
-  `;
-  
-  return a;
-}
-
-function createMobileNavItem(category, anchor) {
-  const a = document.createElement('a');
-  a.href = `#${anchor}`;
-  a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200';
-  a.style.cssText = 'border: 1px solid #0003ff;';
-  a.setAttribute('data-category', anchor);
-  a.textContent = category.name;
-  
-  return a;
-}
-
-function renderProducts() {
-  const productsContainer = document.getElementById('productsContainer');
-  productsContainer.innerHTML = '';
-  
-  Object.entries(categorizedProducts).forEach(([categoryId, categoryData]) => {
-    const categorySection = createCategorySection(categoryData.category, categoryData.products);
-    productsContainer.appendChild(categorySection);
-  });
-}
-
-function createCategorySection(category, products) {
-  const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  
-  const section = document.createElement('section');
-  section.id = anchor;
-  section.className = 'category-section mb-20 scroll-mt-40';
-  section.setAttribute('data-category', anchor);
-  
-  section.innerHTML = `
-    <!-- Category Header -->
-    <div class="flex items-start gap-8 mb-12 p-8 bg-gray-50 rounded-3xl">
-      <!-- Category Image (Hidden on Mobile) -->
-      <div class="flex-shrink-0 hidden md:block">
-        <img 
-          src="${category.image}"
-          alt="${category.name}"
-          class="w-40 h-40 object-cover rounded-2xl"
-          loading="lazy"
-        />
-      </div>
-      
-      <!-- Category Info -->
-      <div class="flex-1 space-y-4">
-        <h2 class="text-3xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
-          ${category.name}
-        </h2>
-        <p class="text-lg text-gray-600 leading-relaxed">
-          ${category.description}
-        </p>
-        <div class="flex items-center text-sm text-gray-500">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #0003ff;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-          </svg>
-          <span class="font-medium">${products.length} ${products.length === 1 ? 'product' : 'products'} available</span>
-          <span class="mx-2">•</span>
-          <a href="#" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
-            View Category
+  productContent.innerHTML = `
+    <!-- Breadcrumb Navigation -->
+    <nav class="mb-8" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-3 text-sm">
+        <li>
+          <a href="/" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+            Home
           </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Products Container -->
-    <div class="relative">
-      ${products.length > 0 ? createProductsGrid(products, category.id) : createEmptyState()}
-    </div>
-  `;
-  
-  return section;
-}
-
-function createProductsGrid(products, categoryId) {
-  const productsHtml = products.map(product => createProductCard(product)).join('');
-  
-  return `
-    <!-- Scroll Indicators -->
-    <button 
-      class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0"
-      style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
-      data-target="products-${categoryId}"
-    >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-    </button>
-    
-    <button 
-      class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200"
-      style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
-      data-target="products-${categoryId}"
-    >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-      </svg>
-    </button>
-
-    <!-- Products Container -->
-    <div 
-      id="products-${categoryId}"
-      class="products-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
-      style="scrollbar-width: none; -ms-overflow-style: none;"
-    >
-      ${productsHtml}
-    </div>
-  `;
-}
-
-function createProductCard(product) {
-  const variationsText = product.variations && product.variations.length > 0 
-    ? `<span class="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
-         ${product.variations.length} ${product.variations.length === 1 ? 'Variation' : 'Variations'}
-       </span>`
-    : '';
-
-  return `
-    <article class="product-card flex-shrink-0 w-72 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group flex flex-col" style="hover:border-color: #0003ff;">
-      <!-- Product Image -->
-      <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50 flex-shrink-0">
-        <img 
-          src="${product.image}"
-          alt="${product.name}"
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
-      </div>
-      
-      <!-- Product Info -->
-      <div class="p-6 flex flex-col flex-grow">
-        <!-- Product Name -->
-        <h3 class="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
-          ${product.name}
-        </h3>
-        
-        <!-- Product Description -->
-        <p class="text-sm text-gray-600 leading-relaxed line-clamp-2 mb-4 flex-grow">
-          ${product.description}
-        </p>
-        
-        <!-- Serial Number & Variations -->
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            Serial: ${product.serialNumber}
-          </span>
-          ${variationsText}
-        </div>
-        
-        <!-- View Button -->
-        <a 
-          href="/products/${product.id}"
-          class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 mt-auto" 
-          style="background-color: #0003ff; font-family: 'Space Grotesk', sans-serif;"
-        >
-          View Specifications
-          <svg class="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        </li>
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
-        </a>
+          <a href="/products" class="text-gray-500 hover:text-gray-700 transition-colors duration-300 font-medium">
+            Products
+          </a>
+        </li>
+        ${currentCategory ? `
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <span class="text-gray-500">${currentCategory.name}</span>
+        </li>
+        ` : ''}
+        <li class="flex items-center">
+          <svg class="w-4 h-4 text-gray-300 mx-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+          <span class="text-gray-900 font-semibold">${currentProduct.name}</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Back to Products Link -->
+    <div class="mb-8">
+      <a 
+        href="/products" 
+        class="inline-flex items-center text-sm font-medium transition-colors duration-200"
+        style="color: #0003ff; hover:color: #0002e6;"
+      >
+        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Products
+      </a>
+    </div>
+
+    <!-- Product Details Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+      
+      <!-- Product Image -->
+      <div class="space-y-6">
+        <div class="aspect-square overflow-hidden rounded-2xl bg-gray-100">
+          <img 
+            src="${currentProduct.image}"
+            alt="${currentProduct.name}"
+            class="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+        
+        ${currentCategory ? `
+        <!-- Category Info Card -->
+        <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+          <img 
+            src="${currentCategory.image}"
+            alt="${currentCategory.name}"
+            class="w-12 h-12 object-cover rounded-lg"
+          />
+          <div>
+            <p class="text-sm font-medium text-gray-900">Category</p>
+            <p class="text-sm text-gray-600">${currentCategory.name}</p>
+          </div>
+        </div>
+        ` : ''}
       </div>
-    </article>
+
+      <!-- Product Information -->
+      <div class="space-y-8">
+        
+        <!-- Product Header -->
+        <div>
+          <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif;">
+            ${currentProduct.name}
+          </h1>
+          
+          <div class="flex items-center space-x-4 mb-6">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+              Serial: ${currentProduct.serialNumber}
+            </span>
+            ${currentProduct.variations && currentProduct.variations.length > 0 ? `
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              ${currentProduct.variations.length} ${currentProduct.variations.length === 1 ? 'Variation' : 'Variations'}
+            </span>
+            ` : ''}
+          </div>
+          
+          <p class="text-lg text-gray-600 leading-relaxed">
+            ${currentProduct.description}
+          </p>
+        </div>
+
+        ${renderProductVariations()}
+
+        <!-- Action Buttons -->
+        <div class="space-y-4">
+          <button 
+            class="w-full text-white px-8 py-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+            style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff;"
+            onclick="window.openContactModal()"
+          >
+            Request Information
+          </button>
+          
+          <a 
+            href="/request-catalogue"
+            class="w-full inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
+            style="border: 1px solid #0003ff; hover:background-color: #f8f9ff; focus:ring-color: #0003ff;"
+          >
+            Download Catalogue
+          </a>
+        </div>
+
+        ${renderVariationIndicator()}
+
+        <!-- Additional Information -->
+        <div class="bg-blue-50 rounded-xl p-6">
+          <h3 class="text-lg font-semibold text-blue-900 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
+            Training Applications
+          </h3>
+          <p class="text-blue-800 text-sm leading-relaxed">
+            This medical equipment is designed for professional healthcare training environments. 
+            Perfect for medical schools, nursing programs, and continuing education facilities. 
+            Meets international quality standards for educational use.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    ${renderProductVariations()}
+
+    ${renderRelatedProducts()}
   `;
+  
+  // Update the ContactModal with real product data
+  updateContactModalWithProductData();
+  
+  // Setup variations scroll functionality
+  setupVariationsScroll();
 }
 
-function createEmptyState() {
+function renderVariationIndicator() {
+  if (!currentProduct.variations || currentProduct.variations.length === 0) {
+    return '';
+  }
+  
   return `
-    <div class="text-center py-16 text-gray-500">
-      <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"></path>
-      </svg>
-      <p class="text-lg">No products available in this category yet.</p>
+    <!-- Variation Indicator Box -->
+    <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-blue-900" style="font-family: 'Space Grotesk', sans-serif;">
+              Product Variations Available
+            </h4>
+            <p class="text-xs text-blue-700">
+              ${currentProduct.variations.length} different specification${currentProduct.variations.length !== 1 ? 's' : ''} available
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">
+            ${currentProduct.variations.length}
+          </span>
+          <button 
+            onclick="document.getElementById('variationsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' })"
+            class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-200 flex items-center space-x-1"
+          >
+            <span>View Details</span>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   `;
 }
 
-function setupNavigation() {
-  // Setup category navigation
-  const categoryNavItems = document.querySelectorAll('.category-nav-item');
-  const categorySection = document.querySelectorAll('.category-section');
+function renderProductVariations() {
+  if (!currentProduct.variations || currentProduct.variations.length === 0) {
+    return '';
+  }
   
-  // Category navigation with active state
-  categoryNavItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href').substring(1);
-      const targetSection = document.getElementById(targetId);
+  const variationsHtml = currentProduct.variations.map((variation, index) => {
+    // Limit to maximum 3 attributes per variation
+    const limitedAttributes = variation.attributes ? variation.attributes.slice(0, 3) : [];
+    
+    return `
+    <div class="flex-shrink-0 w-72 bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff; hover:transform: translateY(-2px);">
+      <!-- Variation Header -->
+      <div class="p-4 pb-3 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <h3 class="text-lg font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
+          ${variation.name}
+        </h3>
+        <div class="flex items-center text-sm text-gray-600">
+          <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>${limitedAttributes.length} Specification${limitedAttributes.length !== 1 ? 's' : ''}</span>
+        </div>
+      </div>
       
-      if (targetSection) {
-        // Update active state
-        categoryNavItems.forEach(nav => nav.classList.remove('active'));
-        this.classList.add('active');
+      <!-- Variation Attributes -->
+      <div class="p-4 pt-3">
+        ${limitedAttributes.length > 0 ? `
+        <div class="space-y-3">
+          ${limitedAttributes.map(attribute => `
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg transition-colors duration-200 hover:bg-gray-100">
+            <div class="flex items-center space-x-3">
+              <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+              <span class="text-sm font-semibold text-gray-700">
+                ${attribute.title}
+              </span>
+            </div>
+            <span class="text-xs text-gray-900 font-bold px-2 py-1 bg-white rounded-full border">
+              ${attribute.value}
+            </span>
+          </div>
+          `).join('')}
+        </div>
+        ` : `
+        <div class="text-center py-6 text-gray-500">
+          <svg class="mx-auto h-8 w-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <p class="text-sm">No specifications available</p>
+        </div>
+        `}
         
-        // Smooth scroll to section
-        targetSection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-        
-        // Update URL without triggering scroll
-        history.pushState(null, null, `#${targetId}`);
-      }
-    });
-  });
-
-  // Mobile bottom navigation
-  const mobileBottomNavItems = document.querySelectorAll('.mobile-bottom-nav-item');
-  mobileBottomNavItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href').substring(1);
-      const targetSection = document.getElementById(targetId);
-      
-      if (targetSection) {
-        // Update active state for mobile nav
-        mobileBottomNavItems.forEach(nav => {
-          nav.style.backgroundColor = 'white';
-          nav.style.color = '#374151';
-        });
-        this.style.backgroundColor = '#0003ff';
-        this.style.color = 'white';
-        
-        targetSection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    });
-  });
-
-  // Setup scroll buttons
-  setupScrollButtons();
+        <!-- Variation Footer -->
+        <div class="mt-4 pt-3 border-t border-gray-100">
+          <div class="flex items-center justify-center">
+            <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              Variation ${index + 1}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
   
-  // Setup intersection observer
-  setupIntersectionObserver();
-  
-  // Handle initial hash
-  handleInitialHash();
+  return `
+    <!-- Product Variations Section -->
+    <div class="border-t border-gray-200 pt-12 mb-12">
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-3" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+          Product Variations
+        </h2>
+        <p class="text-base text-gray-600">
+          Explore different specifications and configurations available for this product
+        </p>
+      </div>
+
+      <!-- Horizontal Scrollable Variations -->
+      <div class="relative">
+        <!-- Scroll Indicators -->
+        <button 
+          class="variations-scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0 shadow-md"
+          style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+          data-target="variationsContainer"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        
+        <button 
+          class="variations-scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 shadow-md"
+          style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+          data-target="variationsContainer"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <!-- Variations Container -->
+        <div 
+          id="variationsContainer"
+          class="variations-scroll flex gap-4 overflow-x-auto pb-4 px-2 scroll-smooth"
+          style="scrollbar-width: none; -ms-overflow-style: none;"
+        >
+          ${variationsHtml}
+        </div>
+      </div>
+
+      <!-- Variations Summary -->
+      <div class="mt-6 text-center">
+        <div class="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full">
+          <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-blue-800 font-medium text-sm">
+            ${currentProduct.variations.length} variation${currentProduct.variations.length !== 1 ? 's' : ''} available for this product
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
-function setupScrollButtons() {
-  const scrollButtons = document.querySelectorAll('.scroll-btn');
+// Setup variations scroll functionality
+function setupVariationsScroll() {
+  const scrollButtons = document.querySelectorAll('.variations-scroll-btn');
   
   scrollButtons.forEach(button => {
     button.addEventListener('click', function() {
@@ -482,15 +496,14 @@ function setupScrollButtons() {
   });
 
   // Update scroll button visibility
-  const productsContainers = document.querySelectorAll('.products-scroll');
+  const variationsContainer = document.getElementById('variationsContainer');
   
-  productsContainers.forEach(container => {
-    const categoryId = container.id.replace('products-', '');
-    const leftBtn = document.querySelector(`.scroll-left[data-target="products-${categoryId}"]`);
-    const rightBtn = document.querySelector(`.scroll-right[data-target="products-${categoryId}"]`);
+  if (variationsContainer) {
+    const leftBtn = document.querySelector('.variations-scroll-btn.scroll-left');
+    const rightBtn = document.querySelector('.variations-scroll-btn.scroll-right');
     
-    function updateScrollButtons() {
-      const { scrollLeft, scrollWidth, clientWidth } = container;
+    function updateVariationsScrollButtons() {
+      const { scrollLeft, scrollWidth, clientWidth } = variationsContainer;
       
       if (scrollLeft > 0) {
         leftBtn.style.opacity = '1';
@@ -505,110 +518,168 @@ function setupScrollButtons() {
       }
     }
     
-    container.addEventListener('scroll', updateScrollButtons);
-    updateScrollButtons();
-  });
-}
-
-function setupIntersectionObserver() {
-  const observerOptions = {
-    root: null,
-    rootMargin: '-20% 0px -70% 0px',
-    threshold: 0
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const categoryId = entry.target.getAttribute('data-category');
-        
-        // Update active navigation item
-        const categoryNavItems = document.querySelectorAll('.category-nav-item');
-        categoryNavItems.forEach(nav => {
-          nav.classList.remove('active');
-          if (nav.getAttribute('data-category') === categoryId) {
-            nav.classList.add('active');
-          }
-        });
-      }
-    });
-  }, observerOptions);
-
-  // Observe all category sections
-  const categorySection = document.querySelectorAll('.category-section');
-  categorySection.forEach(section => {
-    observer.observe(section);
-  });
-}
-
-function handleInitialHash() {
-  if (window.location.hash) {
-    const targetId = window.location.hash.substring(1);
-    const targetSection = document.getElementById(targetId);
-    if (targetSection) {
-      setTimeout(() => {
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
+    variationsContainer.addEventListener('scroll', updateVariationsScrollButtons);
+    
+    // Initial check
+    setTimeout(updateVariationsScrollButtons, 100);
   }
 }
+
+function renderRelatedProducts() {
+  if (!relatedProducts || relatedProducts.length === 0) {
+    return `
+      <!-- Related Products Section -->
+      <div class="border-t border-gray-200 pt-12">
+        <div class="mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+            More from ${currentCategory ? currentCategory.name : 'this category'}
+          </h2>
+          <p class="text-lg text-gray-600">
+            Explore other products in this category
+          </p>
+        </div>
+        
+        <div class="text-center py-12 text-gray-500">
+          <p class="text-lg">No other products available in this category yet.</p>
+        </div>
+      </div>
+    `;
+  }
+  
+  const relatedProductsHtml = relatedProducts.map(product => `
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group" style="hover:border-color: #0003ff;">
+      <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50">
+        <img 
+          src="${product.image}"
+          alt="${product.name}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
+      
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-gray-900 leading-tight mb-3" style="font-family: 'Space Grotesk', sans-serif;">
+          ${product.name}
+        </h3>
+        
+        <p class="text-sm text-gray-600 leading-relaxed mb-4">
+          ${product.description}
+        </p>
+        
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Serial: ${product.serialNumber}
+          </span>
+        </div>
+        
+        <a 
+          href="/products/${product.id}"
+          class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl transition-all duration-200"
+          style="background-color: #0003ff; hover:background-color: #0002e6; font-family: 'Space Grotesk', sans-serif;"
+        >
+          View Specifications
+          <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <!-- Related Products Section -->
+    <div class="border-t border-gray-200 pt-12">
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
+          More from ${currentCategory ? currentCategory.name : 'this category'}
+        </h2>
+        <p class="text-lg text-gray-600">
+          Explore other products in this category
+        </p>
+      </div>
+
+      <!-- Related Products Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${relatedProductsHtml}
+      </div>
+
+      <!-- View All Category Products -->
+      ${currentCategory ? `
+      <div class="text-center mt-12">
+        <a 
+          href="/products#${currentCategory.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}"
+          class="inline-flex items-center px-8 py-3 text-white font-semibold rounded-xl transition-colors duration-200"
+          style="background-color: #0003ff; hover:background-color: #0002e6;"
+        >
+          View All ${currentCategory.name}
+          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateContactModalWithProductData() {
+  // Update product info in the ContactModal component
+  const productImage = document.querySelector('#contactModal .p-4.bg-gray-50 img');
+  const productName = document.querySelector('#contactModal .font-bold.text-gray-900.text-lg');
+  const productSerial = document.querySelector('#contactModal .text-sm.text-gray-600');
+  const productCategory = document.querySelector('#contactModal .text-xs.text-gray-500');
+  
+  if (productImage && currentProduct) {
+    productImage.src = currentProduct.image;
+    productImage.alt = currentProduct.name;
+  }
+  
+  if (productName && currentProduct) {
+    productName.textContent = currentProduct.name;
+  }
+  
+  if (productSerial && currentProduct) {
+    productSerial.textContent = `Serial: ${currentProduct.serialNumber}`;
+  }
+  
+  if (productCategory && currentCategory) {
+    productCategory.textContent = currentCategory.name;
+  }
+  
+  // Update message field with product info
+  const messageField = document.getElementById('contactMessage');
+  if (messageField && currentProduct) {
+    messageField.value = `I'm interested in learning more about ${currentProduct.name}${currentProduct.serialNumber ? ` (Serial: ${currentProduct.serialNumber})` : ''}. Please provide additional information about pricing, availability, and technical specifications.`;
+  }
+}
+
+
+
+
+
+
+
 </script>
 
 <!-- Enhanced Styles -->
 <style>
-/* Hide scrollbars for horizontal scroll */
-.products-scroll::-webkit-scrollbar,
-.lg\:hidden .overflow-x-auto::-webkit-scrollbar {
-  display: none;
-}
-
-/* Active category navigation state */
-.category-nav-item.active {
-  background-color: #0003ff !important;
-  border-color: #0003ff !important;
-  color: white !important;
-}
-
-.category-nav-item.active span:last-child {
-  background-color: white !important;
-  color: #0003ff !important;
-}
-
-/* Category nav hover effects */
-.category-nav-item:hover {
-  background-color: #0003ff !important;
-  border-color: #0003ff !important;
-  color: white !important;
-}
-
-.category-nav-item:hover span:last-child {
-  background-color: white !important;
-  color: #0003ff !important;
-}
-
-/* Mobile bottom nav scrollbar hide */
-.mobile-bottom-nav-item::-webkit-scrollbar {
-  display: none;
-}
-
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Line clamp utilities */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Premium hover effects */
-.product-card:hover {
-  transform: translateY(-2px);
-}
-
 /* Loading animation */
 @keyframes spin {
   to {
@@ -620,34 +691,29 @@ html {
   animation: spin 1s linear infinite;
 }
 
-/* Performance optimizations */
-.product-card {
-  contain: layout style paint;
+/* Modal animations */
+.modal-content {
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.products-scroll {
-  contain: layout style;
+/* Button hover effects */
+button:hover, a:hover {
+  transform: translateY(-1px);
+}
+
+/* Product card hover effects */
+.group:hover {
+  transform: translateY(-2px);
 }
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  
-  .product-card {
-    transition: none;
-  }
-  
-  .scroll-btn {
-    transition: none;
-  }
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 1023px) {
-  .lg\:ml-80 {
-    margin-left: 0 !important;
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
