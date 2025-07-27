@@ -2,7 +2,6 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import CategorySection from '../components/CategorySection.astro';
 ---
 
 <Layout 
@@ -11,14 +10,12 @@ import CategorySection from '../components/CategorySection.astro';
 >
   <Navbar />
   
-  <!-- Main Products Layout -->
   <div class="min-h-screen bg-white">
     <div class="relative">
       
       <!-- Left Sidebar - Fixed Categories Index -->
       <aside class="fixed left-0 top-32 w-80 z-30 p-6 h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block">
         <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6" style="border: 1px solid #0003ff;">
-          <!-- Sidebar Header -->
           <div class="mb-8">
             <h2 class="text-xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">
               Product Categories
@@ -28,42 +25,18 @@ import CategorySection from '../components/CategorySection.astro';
             </p>
           </div>
 
-          <!-- Categories Navigation -->
           <nav id="categoriesNav" class="space-y-2" aria-label="Product categories">
             <!-- Categories will be loaded dynamically -->
           </nav>
         </div>
       </aside>
 
-      <!-- Mobile Categories Toggle -->
       <!-- Mobile Bottom Navigation Bar -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t" style="border-color: #0003ff;">
         <div class="px-4 py-3">
           <div id="mobileNav" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: none;">
             <!-- Mobile nav will be loaded dynamically -->
           </div>
-        </div>
-      </div>
-
-      <!-- Mobile Categories Overlay -->
-      <div id="mobileCategories" class="lg:hidden fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="mobileOverlay"></div>
-        <div class="absolute left-0 top-0 w-80 h-full bg-white/95 backdrop-blur-md p-6 transform -translate-x-full transition-transform duration-300" id="mobileCategoriesPanel">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900" style="font-family: 'Space Grotesk', sans-serif;">
-              Categories
-            </h2>
-            <button id="closeMobileCategories" class="p-2 text-gray-500 hover:text-gray-700">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-          
-          <!-- Mobile Categories Navigation -->
-          <nav id="mobileCategoriesNav" class="space-y-2" aria-label="Product categories">
-            <!-- Mobile categories will be loaded dynamically -->
-          </nav>
         </div>
       </div>
 
@@ -85,12 +58,12 @@ import CategorySection from '../components/CategorySection.astro';
 
           <!-- Loading State -->
           <div id="loadingState" class="text-center py-16">
-            <div class="inline-flex items-center px-6 py-3 bg-blue-50 rounded-full">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div class="inline-flex items-center px-6 py-3 rounded-full" style="background-color: rgba(0, 3, 255, 0.1);">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5" style="color: #0003ff;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span class="#0003ff font-medium">Loading products from database...</span>
+              <span class="font-medium" style="color: #0003ff;">Loading products from database...</span>
             </div>
           </div>
 
@@ -107,7 +80,7 @@ import CategorySection from '../components/CategorySection.astro';
               </svg>
               <h3 class="text-lg font-semibold text-gray-900 mb-2">Unable to load products</h3>
               <p class="text-gray-600 mb-4">There was an issue connecting to the database. Please try refreshing the page.</p>
-              <button onclick="window.location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button onclick="window.location.reload()" class="px-6 py-2 text-white rounded-lg transition-colors" style="background-color: #0003ff; hover:background-color: #0002cc;">
                 Refresh Page
               </button>
             </div>
@@ -120,43 +93,29 @@ import CategorySection from '../components/CategorySection.astro';
   <Footer />
 </Layout>
 
-<!-- Dynamic Loading Script -->
 <script>
 import { fetchGroupedDataClient } from '../lib/firestore.js';
 
-// Global state
 let categoriesData = [];
 let categorizedProducts = {};
 
-// Initialize dynamic loading
 document.addEventListener('DOMContentLoaded', async function() {
-  console.log('🚀 Starting dynamic product loading...');
-  
   try {
-    // Show loading state
     showLoadingState();
     
-    // Fetch data dynamically
     const data = await fetchGroupedDataClient();
     categoriesData = data.categories;
     categorizedProducts = data.categorizedProducts;
     
-    console.log('📊 Loaded data:', { 
-      categories: categoriesData.length, 
-      products: Object.keys(categorizedProducts).length 
-    });
-    
-    // Render the UI
     renderCategories();
     renderProducts();
     setupNavigation();
     
-    // Hide loading, show content
     hideLoadingState();
     showProductsContainer();
     
   } catch (error) {
-    console.error('❌ Error loading products:', error);
+    console.error('Error loading products:', error);
     showErrorState();
   }
 });
@@ -184,36 +143,26 @@ function showErrorState() {
 function renderCategories() {
   const categoriesNav = document.getElementById('categoriesNav');
   const mobileNav = document.getElementById('mobileNav');
-  const mobileCategoriesNav = document.getElementById('mobileCategoriesNav');
   
-  // Clear existing content
   categoriesNav.innerHTML = '';
   mobileNav.innerHTML = '';
-  mobileCategoriesNav.innerHTML = '';
   
   categoriesData.forEach(category => {
     const anchor = category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const productCount = categorizedProducts[category.id]?.products?.length || 0;
     
-    // Desktop navigation
-    const desktopNavItem = createCategoryNavItem(category, anchor, productCount, 'desktop');
+    const desktopNavItem = createCategoryNavItem(category, anchor, productCount);
     categoriesNav.appendChild(desktopNavItem);
     
-    // Mobile bottom navigation
     const mobileNavItem = createMobileNavItem(category, anchor);
     mobileNav.appendChild(mobileNavItem);
-    
-    // Mobile sidebar navigation
-    const mobileSidebarItem = createCategoryNavItem(category, anchor, productCount, 'mobile');
-    mobileCategoriesNav.appendChild(mobileSidebarItem);
   });
 }
 
-function createCategoryNavItem(category, anchor, productCount, type) {
+function createCategoryNavItem(category, anchor, productCount) {
   const a = document.createElement('a');
   a.href = `#${anchor}`;
-  a.className = `category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 hover:text-white transition-all duration-200 border border-transparent`;
-  a.style.cssText = 'hover:background-color: #0003ff; hover:border-color: #0003ff;';
+  a.className = `category-nav-item group flex items-center justify-between p-3 rounded-xl text-gray-700 transition-all duration-200 border border-transparent`;
   a.setAttribute('data-category', anchor);
   
   a.innerHTML = `
@@ -229,7 +178,7 @@ function createCategoryNavItem(category, anchor, productCount, type) {
 function createMobileNavItem(category, anchor) {
   const a = document.createElement('a');
   a.href = `#${anchor}`;
-  a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 hover:text-white transition-all duration-200';
+  a.className = 'mobile-bottom-nav-item flex-shrink-0 px-4 py-2 bg-white rounded-full text-sm font-medium text-gray-700 transition-all duration-200';
   a.style.cssText = 'border: 1px solid #0003ff;';
   a.setAttribute('data-category', anchor);
   a.textContent = category.name;
@@ -256,9 +205,7 @@ function createCategorySection(category, products) {
   section.setAttribute('data-category', anchor);
   
   section.innerHTML = `
-    <!-- Category Header -->
     <div class="flex items-start gap-8 mb-12 p-8 bg-gray-50 rounded-3xl">
-      <!-- Category Image (Hidden on Mobile) -->
       <div class="flex-shrink-0 hidden md:block">
         <img 
           src="${category.image}"
@@ -268,7 +215,6 @@ function createCategorySection(category, products) {
         />
       </div>
       
-      <!-- Category Info -->
       <div class="flex-1 space-y-4">
         <h2 class="text-3xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: rgb(238, 159, 32);">
           ${category.name}
@@ -282,14 +228,13 @@ function createCategorySection(category, products) {
           </svg>
           <span class="font-medium">${products.length} ${products.length === 1 ? 'product' : 'products'} available</span>
           <span class="mx-2">•</span>
-          <a href="#" class="font-medium transition-colors duration-200" style="color: #0003ff; hover:color: #0002e6;">
+          <a href="#" class="font-medium transition-colors duration-200" style="color: #0003ff;">
             View Category
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Products Container -->
     <div class="relative">
       ${products.length > 0 ? createProductsGrid(products, category.id) : createEmptyState()}
     </div>
@@ -302,10 +247,8 @@ function createProductsGrid(products, categoryId) {
   const productsHtml = products.map(product => createProductCard(product)).join('');
   
   return `
-    <!-- Scroll Indicators -->
     <button 
-      class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200 opacity-0"
-      style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+      class="scroll-btn scroll-left absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 transition-all duration-200 opacity-0"
       data-target="products-${categoryId}"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,8 +257,7 @@ function createProductsGrid(products, categoryId) {
     </button>
     
     <button 
-      class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-white transition-all duration-200"
-      style="hover:background-color: #0003ff; hover:border-color: #0003ff;"
+      class="scroll-btn scroll-right absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full border border-gray-200 flex items-center justify-center text-gray-600 transition-all duration-200"
       data-target="products-${categoryId}"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,11 +265,10 @@ function createProductsGrid(products, categoryId) {
       </svg>
     </button>
 
-    <!-- Products Container -->
     <div 
       id="products-${categoryId}"
       class="products-scroll flex gap-6 overflow-x-auto pb-4 px-2 scroll-smooth"
-      style="scrollbar-width: none; -ms-overflow-style: none;"
+      style="scrollbar-width: none;"
     >
       ${productsHtml}
     </div>
@@ -336,14 +277,13 @@ function createProductsGrid(products, categoryId) {
 
 function createProductCard(product) {
   const variationsText = product.variations && product.variations.length > 0 
-    ? `<span class="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+    ? `<span class="text-xs font-medium text-white px-3 py-1 rounded-full" style="background-color: #0003ff;">
          ${product.variations.length} ${product.variations.length === 1 ? 'Variation' : 'Variations'}
        </span>`
     : '';
 
   return `
     <article class="product-card flex-shrink-0 w-72 bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 group flex flex-col" style="hover:border-color: #0003ff;">
-      <!-- Product Image -->
       <div class="aspect-square w-full h-48 overflow-hidden bg-gray-50 flex-shrink-0">
         <img 
           src="${product.image}"
@@ -353,19 +293,15 @@ function createProductCard(product) {
         />
       </div>
       
-      <!-- Product Info -->
       <div class="p-6 flex flex-col flex-grow">
-        <!-- Product Name -->
         <h3 class="text-lg font-bold text-gray-900 leading-tight line-clamp-2 mb-3" style="font-family: 'Space Grotesk', sans-serif;">
           ${product.name}
         </h3>
         
-        <!-- Product Description -->
         <p class="text-sm text-gray-600 leading-relaxed line-clamp-2 mb-4 flex-grow">
           ${product.description}
         </p>
         
-        <!-- Serial Number & Variations -->
         <div class="flex items-center justify-between mb-4">
           <span class="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             Serial: ${product.serialNumber}
@@ -373,11 +309,10 @@ function createProductCard(product) {
           ${variationsText}
         </div>
         
-        <!-- View Button -->
         <a 
           href="/products/${product.id}"
           class="inline-flex items-center justify-center w-full px-4 py-3 text-white text-sm font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 mt-auto"
-          style="background-color: #0003ff; hover:background-color: #0002e6; focus:ring-color: #0003ff; font-family: 'Space Grotesk', sans-serif;"
+          style="background-color: #0003ff; font-family: 'Space Grotesk', sans-serif; focus:ring-color: #0003ff;"
         >
           View Specifications
           <svg class="ml-2 w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,11 +336,8 @@ function createEmptyState() {
 }
 
 function setupNavigation() {
-  // Setup category navigation
   const categoryNavItems = document.querySelectorAll('.category-nav-item');
-  const categorySection = document.querySelectorAll('.category-section');
   
-  // Category navigation with active state
   categoryNavItems.forEach(item => {
     item.addEventListener('click', function(e) {
       e.preventDefault();
@@ -413,23 +345,19 @@ function setupNavigation() {
       const targetSection = document.getElementById(targetId);
       
       if (targetSection) {
-        // Update active state
         categoryNavItems.forEach(nav => nav.classList.remove('active'));
         this.classList.add('active');
         
-        // Smooth scroll to section
         targetSection.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
         
-        // Update URL without triggering scroll
         history.pushState(null, null, `#${targetId}`);
       }
     });
   });
 
-  // Mobile bottom navigation
   const mobileBottomNavItems = document.querySelectorAll('.mobile-bottom-nav-item');
   mobileBottomNavItems.forEach(item => {
     item.addEventListener('click', function(e) {
@@ -438,7 +366,6 @@ function setupNavigation() {
       const targetSection = document.getElementById(targetId);
       
       if (targetSection) {
-        // Update active state for mobile nav
         mobileBottomNavItems.forEach(nav => {
           nav.style.backgroundColor = 'white';
           nav.style.color = '#374151';
@@ -454,13 +381,8 @@ function setupNavigation() {
     });
   });
 
-  // Setup scroll buttons
   setupScrollButtons();
-  
-  // Setup intersection observer
   setupIntersectionObserver();
-  
-  // Handle initial hash
   handleInitialHash();
 }
 
@@ -481,7 +403,6 @@ function setupScrollButtons() {
     });
   });
 
-  // Update scroll button visibility
   const productsContainers = document.querySelectorAll('.products-scroll');
   
   productsContainers.forEach(container => {
@@ -492,17 +413,8 @@ function setupScrollButtons() {
     function updateScrollButtons() {
       const { scrollLeft, scrollWidth, clientWidth } = container;
       
-      if (scrollLeft > 0) {
-        leftBtn.style.opacity = '1';
-      } else {
-        leftBtn.style.opacity = '0';
-      }
-      
-      if (scrollLeft + clientWidth < scrollWidth - 10) {
-        rightBtn.style.opacity = '1';
-      } else {
-        rightBtn.style.opacity = '0';
-      }
+      leftBtn.style.opacity = scrollLeft > 0 ? '1' : '0';
+      rightBtn.style.opacity = scrollLeft + clientWidth < scrollWidth - 10 ? '1' : '0';
     }
     
     container.addEventListener('scroll', updateScrollButtons);
@@ -511,18 +423,11 @@ function setupScrollButtons() {
 }
 
 function setupIntersectionObserver() {
-  const observerOptions = {
-    root: null,
-    rootMargin: '-20% 0px -70% 0px',
-    threshold: 0
-  };
-
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const categoryId = entry.target.getAttribute('data-category');
         
-        // Update active navigation item
         const categoryNavItems = document.querySelectorAll('.category-nav-item');
         categoryNavItems.forEach(nav => {
           nav.classList.remove('active');
@@ -532,9 +437,12 @@ function setupIntersectionObserver() {
         });
       }
     });
-  }, observerOptions);
+  }, {
+    root: null,
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  });
 
-  // Observe all category sections
   const categorySection = document.querySelectorAll('.category-section');
   categorySection.forEach(section => {
     observer.observe(section);
@@ -554,15 +462,12 @@ function handleInitialHash() {
 }
 </script>
 
-<!-- Enhanced Styles -->
 <style>
-/* Hide scrollbars for horizontal scroll */
 .products-scroll::-webkit-scrollbar,
 .lg\:hidden .overflow-x-auto::-webkit-scrollbar {
   display: none;
 }
 
-/* Active category navigation state */
 .category-nav-item.active {
   background-color: #0003ff !important;
   border-color: #0003ff !important;
@@ -574,7 +479,6 @@ function handleInitialHash() {
   color: #0003ff !important;
 }
 
-/* Category nav hover effects */
 .category-nav-item:hover {
   background-color: #0003ff !important;
   border-color: #0003ff !important;
@@ -586,17 +490,20 @@ function handleInitialHash() {
   color: #0003ff !important;
 }
 
-/* Mobile bottom nav scrollbar hide */
+.scroll-btn:hover {
+  background-color: #0003ff !important;
+  border-color: #0003ff !important;
+  color: white !important;
+}
+
 .mobile-bottom-nav-item::-webkit-scrollbar {
   display: none;
 }
 
-/* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Line clamp utilities */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -604,12 +511,10 @@ html {
   overflow: hidden;
 }
 
-/* Premium hover effects */
 .product-card:hover {
   transform: translateY(-2px);
 }
 
-/* Loading animation */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -620,7 +525,6 @@ html {
   animation: spin 1s linear infinite;
 }
 
-/* Performance optimizations */
 .product-card {
   contain: layout style paint;
 }
@@ -629,22 +533,17 @@ html {
   contain: layout style;
 }
 
-/* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   
-  .product-card {
-    transition: none;
-  }
-  
+  .product-card,
   .scroll-btn {
     transition: none;
   }
 }
 
-/* Mobile responsive adjustments */
 @media (max-width: 1023px) {
   .lg\:ml-80 {
     margin-left: 0 !important;
